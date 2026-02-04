@@ -1,0 +1,133 @@
+body {
+  margin: 0;
+  min-height: 100vh;
+  background: linear-gradient(135deg, #ff9a9e, #fad0c4);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-family: Arial, sans-serif;
+}
+
+.card {
+  background: white;
+  padding: 25px;
+  width: 330px;
+  text-align: center;
+  border-radius: 20px;
+  box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+}
+
+h1 {
+  margin: 0;
+  font-size: 38px;
+  color: #ff4d6d;
+}
+
+.tagline {
+  color: #666;
+  margin-bottom: 10px;
+}
+
+.text {
+  font-size: 14px;
+  margin-bottom: 10px;
+}
+
+/* Heart animation */
+.heart {
+  width: 20px;
+  height: 20px;
+  background: #ff4d6d;
+  position: relative;
+  margin: 15px auto;
+  transform: rotate(45deg);
+  animation: beat 1s infinite;
+}
+
+.heart::before,
+.heart::after {
+  content: "";
+  width: 20px;
+  height: 20px;
+  background: #ff4d6d;
+  border-radius: 50%;
+  position: absolute;
+}
+
+.heart::before {
+  top: -10px;
+  left: 0;
+}
+
+.heart::after {
+  left: -10px;
+  top: 0;
+}
+
+@keyframes beat {
+  0% { transform: rotate(45deg) scale(1); }
+  50% { transform: rotate(45deg) scale(1.3); }
+  100% { transform: rotate(45deg) scale(1); }
+}
+
+/* Gallery */
+h2 {
+  font-size: 16px;
+  margin-top: 15px;
+}
+
+.gallery {
+  display: flex;
+  gap: 8px;
+  justify-content: center;
+  margin-bottom: 15px;
+}
+
+.gallery img {
+  width: 80px;
+  height: 80px;
+  border-radius: 10px;
+  object-fit: cover;
+}
+
+/* Instagram button */
+.insta {
+  display: inline-block;
+  padding: 10px 15px;
+  background: #e1306c;
+  color: white;
+  border-radius: 20px;
+  text-decoration: none;
+  font-size: 14px;
+}
+
+.insta:hover {
+  background: #c2185b;
+}
+/* SECRET invisible click area - BIG */
+.secret-zone {
+  position: fixed;
+  bottom: 0;
+  right: 0;
+  width: 120px;
+  height: 120px;
+  opacity: 0;
+  z-index: 9999;
+  cursor: pointer;
+}
+/* PATTERN */
+.pattern-box {
+  position: fixed;
+  bottom: 10px;
+  left: 10px;
+  display: flex;
+  gap: 10px;
+  opacity: 0;
+}
+
+.dot {
+  width: 18px;
+  height: 18px;
+  background: pink;
+  border-radius: 50%;
+}

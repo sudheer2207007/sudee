@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>SUDEE ❤️</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div class="card">
+  <h1>SUDEE ❤️</h1>
+  <p class="tagline">Sudheer & Deepu</p>
+  <p class="text">Two hearts 💕 One name 💫</p>
+
+  <!-- HEART -->
+  <div class="heart" id="heart"></div>
+
+  <h2>Our Gallery 📸</h2>
+  <div class="gallery">
+    <img src="https://picsum.photos/200?1">
+    <img src="https://picsum.photos/200?2">
+    <img src="https://picsum.photos/200?3">
+  </div>
+
+  <a href="https://instagram.com/" target="_blank" class="insta">
+    Follow us on Instagram ❤️
+  </a>
+</div>
+
+<!-- PATTERN UNLOCK -->
+<div class="pattern-box" id="pattern">
+  <div class="dot" onclick="tap(1)"></div>
+  <div class="dot" onclick="tap(2)"></div>
+  <div class="dot" onclick="tap(3)"></div>
+</div>
+
+<script>
+/* ❤️ HEART 3 CLICKS */
+let heartCount = 0;
+document.getElementById("heart").onclick = () => {
+  heartCount++;
+  if (heartCount === 3) unlock();
+  setTimeout(()=>heartCount=0,1000);
+};
+
+/* 📱 SHAKE DETECTION */
+if (window.DeviceMotionEvent) {
+  let lastX;
+  window.addEventListener("devicemotion", e => {
+    let x = e.acceleration.x;
+    if (lastX && Math.abs(x - lastX) > 15) unlock();
+    lastX = x;
+  });
+}
+
+/* ⏰ NIGHT TIME CHECK */
+function nightAllowed() {
+  let h = new Date().getHours();
+  return (h >= 18 || h <= 5);
+}
+
+/* 🔐 PATTERN UNLOCK */
+let pattern = "";
+function tap(n) {
+  pattern += n;
+  if (pattern === "132") unlock();
+  if (pattern.length > 3) pattern = "";
+}
+
+/* 🔓 FINAL UNLOCK */
+function unlock() {
+  if (!nightAllowed()) {
+    alert("Only night time lo open avtadi 😏🌙");
+    return;
+  }
+  let pass = prompt("Password cheppu bujji 😘");
+  if (pass === "sudee") {
+    window.location.href = "secret.html";
+  } else {
+    alert("Wrong password ❌");
+  }
+}
+</script>
+
+</body>
+</html>
