@@ -2,84 +2,322 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>SUDEE ❤️</title>
-  <link rel="stylesheet" href="style.css">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <title>SUDEE ❤️ DEEPU</title>
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@700&family=Poppins:wght@300;500;700&display=swap" rel="stylesheet">
+  
+  <style>
+    :root {
+      --primary: #ff4d6d;
+      --glass: rgba(255, 255, 255, 0.15);
+      --glass-border: rgba(255, 255, 255, 0.3);
+    }
+    * { box-sizing: border-box; user-select: none; -webkit-user-select: none; }
+
+    body {
+      margin: 0; height: 100vh; overflow: hidden;
+      font-family: 'Poppins', sans-serif;
+      background: linear-gradient(135deg, #2b1055, #7597de);
+      display: flex; justify-content: center; align-items: center;
+      color: white;
+    }
+
+    /* BACKGROUND STARS */
+    .stars {
+      position: absolute; top:0; left:0; width:100%; height:100%; pointer-events:none;
+      background-image: radial-gradient(white 1px, transparent 1px);
+      background-size: 50px 50px; opacity: 0.3;
+    }
+
+    /* MAIN CARD */
+    .card {
+      background: var(--glass);
+      backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+      border: 1px solid var(--glass-border);
+      border-radius: 30px;
+      padding: 30px; text-align: center;
+      width: 90%; max-width: 380px;
+      box-shadow: 0 30px 60px rgba(0,0,0,0.5);
+      position: relative; z-index: 10;
+      transition: all 0.6s ease;
+    }
+
+    .hidden-card { display: none; }
+
+    h1 {
+      font-family: 'Dancing Script', cursive; font-size: 3.2rem; margin: 0;
+      background: linear-gradient(to right, #fff, #ff99ac);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+      filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3));
+    }
+
+    /* TARGET HEART (Drop Zone) */
+    .heart-zone {
+      width: 100px; height: 100px; margin: 20px auto;
+      background: rgba(255, 77, 109, 0.2);
+      border-radius: 50%;
+      display: flex; justify-content: center; align-items: center;
+      font-size: 3.5rem;
+      border: 2px dashed rgba(255, 255, 255, 0.3);
+      transition: 0.3s;
+    }
+    .heart-zone.drag-over {
+      transform: scale(1.2); border-color: #fff; background: rgba(255, 77, 109, 0.5);
+      box-shadow: 0 0 30px #ff4d6d;
+    }
+
+    /* DRAGGABLE KEY */
+    .drag-key {
+      position: absolute; bottom: -80px; left: 50%;
+      transform: translateX(-50%);
+      font-size: 3rem; cursor: grab;
+      filter: drop-shadow(0 5px 10px rgba(0,0,0,0.5));
+      animation: floatKey 3s ease-in-out infinite;
+      z-index: 100; touch-action: none; /* Crucial for mobile drag */
+    }
+    .drag-key:active { cursor: grabbing; animation: none; }
+
+    @keyframes floatKey {
+      0%, 100% { transform: translateX(-50%) translateY(0); }
+      50% { transform: translateX(-50%) translateY(-15px); }
+    }
+
+    /* EMOJI PASSWORD PAD */
+    .emoji-modal {
+      position: absolute; top:0; left:0; width:100%; height:100%;
+      background: rgba(20, 10, 30, 0.95);
+      border-radius: 30px;
+      display: flex; flex-direction: column; justify-content: center; align-items: center;
+      opacity: 0; pointer-events: none; transition: 0.3s;
+    }
+    .emoji-modal.open { opacity: 1; pointer-events: all; }
+
+    .emoji-grid {
+      display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; margin-top: 20px;
+    }
+    .emoji-btn {
+      font-size: 2rem; background: rgba(255,255,255,0.1);
+      border: none; padding: 15px; border-radius: 15px; cursor: pointer;
+      transition: 0.2s;
+    }
+    .emoji-btn:active { background: #ff4d6d; transform: scale(0.9); }
+
+    .pass-display {
+      font-size: 2rem; letter-spacing: 5px; min-height: 40px; margin-bottom: 10px;
+    }
+
+    /* VIDEO & SECRET CONTENT */
+    .video-box {
+      margin-top: 15px; border-radius: 15px; overflow: hidden;
+      border: 2px solid rgba(255,255,255,0.2);
+      position: relative; padding-bottom: 56.25%; height: 0;
+    }
+    .video-box iframe { position: absolute; top:0; left:0; width:100%; height:100%; }
+
+    .btn {
+      background: #ff4d6d; color: white; border: none;
+      padding: 10px 25px; border-radius: 50px; margin-top: 15px;
+      font-size: 1rem; cursor: pointer;
+    }
+
+    .toast {
+      position: fixed; top: 20px; background: white; color: black;
+      padding: 8px 20px; border-radius: 20px; font-size: 0.9rem;
+      transform: translateY(-100px); transition: 0.3s; z-index: 200;
+    }
+  </style>
 </head>
 <body>
 
-<div class="card">
-  <h1>SUDEE ❤️</h1>
-  <p class="tagline">Sudheer & Deepu</p>
-  <p class="text">Two hearts 💕 One name 💫</p>
+<div class="stars"></div>
 
-  <!-- HEART -->
-  <div class="heart" id="heart"></div>
+<div class="toast" id="toast">Wait for night time! 🌙</div>
 
-  <h2>Our Gallery 📸</h2>
-  <div class="gallery">
-    <img src="https://picsum.photos/200?1">
-    <img src="https://picsum.photos/200?2">
-    <img src="https://picsum.photos/200?3">
+<div class="card" id="mainCard">
+  <div id="lockedView">
+    <h1>Sudheer & Deepu</h1>
+    <p style="opacity:0.8; font-size:0.9rem;">Drag the key to the heart ❤️</p>
+
+    <div class="heart-zone" id="dropZone">❤️</div>
+
+    <div style="display: flex; gap:10px; justify-content: center; margin-top:20px;">
+      <img src="https://picsum.photos/100?1" style="border-radius:10px; width:70px;">
+      <img src="https://picsum.photos/100?2" style="border-radius:10px; width:70px;">
+      <img src="https://picsum.photos/100?3" style="border-radius:10px; width:70px;">
+    </div>
   </div>
 
-  <a href="https://instagram.com/" target="_blank" class="insta">
-    Follow us on Instagram ❤️
-  </a>
-</div>
+  <div class="drag-key" id="dragKey">🗝️</div>
 
-<!-- PATTERN UNLOCK -->
-<div class="pattern-box" id="pattern">
-  <div class="dot" onclick="tap(1)"></div>
-  <div class="dot" onclick="tap(2)"></div>
-  <div class="dot" onclick="tap(3)"></div>
+  <div class="emoji-modal" id="passModal">
+    <h3>Enter Love Code</h3>
+    <div class="pass-display" id="passDisplay"></div>
+    <div class="emoji-grid">
+      <button class="emoji-btn" onclick="typePass('💍')">💍</button>
+      <button class="emoji-btn" onclick="typePass('🌹')">🌹</button>
+      <button class="emoji-btn" onclick="typePass('😘')">😘</button>
+      <button class="emoji-btn" onclick="typePass('🍫')">🍫</button>
+      <button class="emoji-btn" onclick="typePass('🏠')">🏠</button>
+      <button class="emoji-btn" onclick="typePass('🚀')">🚀</button>
+      <button class="emoji-btn" onclick="typePass('🌙')">🌙</button>
+      <button class="emoji-btn" onclick="typePass('🚗')">🚗</button>
+      <button class="emoji-btn" onclick="typePass('🐼')">🐼</button>
+    </div>
+    <button onclick="clearPass()" style="margin-top:20px; background:transparent; border:1px solid #666; color:#aaa; padding:5px 15px; border-radius:15px;">Clear</button>
+  </div>
+
+  <div id="unlockedView" class="hidden-card">
+    <h1>Our Forever</h1>
+    <p>Since Dec 9, 2023</p>
+    
+    <div style="font-size:2.5rem; font-weight:bold; color:#ff99ac;" id="daysCount">0</div>
+    <div style="font-size:0.8rem; margin-bottom:15px;">Days Together</div>
+
+    <div class="video-box">
+      <iframe src="https://www.youtube.com/embed/2Vv-BfVoq4g?si=vPj3-d8Z3qf&controls=1" frameborder="0" allowfullscreen></iframe>
+    </div>
+
+    <button class="btn" onclick="location.reload()">🔒 Relock</button>
+  </div>
 </div>
 
 <script>
-/* ❤️ HEART 3 CLICKS */
-let heartCount = 0;
-document.getElementById("heart").onclick = () => {
-  heartCount++;
-  if (heartCount === 3) unlock();
-  setTimeout(()=>heartCount=0,1000);
-};
+  /* --- 1. CONFIGURATION --- */
+  // The Password Sequence (Change emojis here to set your password)
+  const PASSWORD = ['😘', '💍', '🏠', '🚀']; 
+  const NIGHT_ONLY = true; // Set false to test in daytime
 
-/* 📱 SHAKE DETECTION */
-if (window.DeviceMotionEvent) {
-  let lastX;
-  window.addEventListener("devicemotion", e => {
-    let x = e.acceleration.x;
-    if (lastX && Math.abs(x - lastX) > 15) unlock();
-    lastX = x;
-  });
-}
+  /* --- 2. DRAG & DROP LOGIC --- */
+  const key = document.getElementById('dragKey');
+  const zone = document.getElementById('dropZone');
+  let isDragging = false;
+  
+  // Touch Events (Mobile)
+  key.addEventListener('touchstart', startDrag, {passive: false});
+  key.addEventListener('touchmove', moveDrag, {passive: false});
+  key.addEventListener('touchend', endDrag);
 
-/* ⏰ NIGHT TIME CHECK */
-function nightAllowed() {
-  let h = new Date().getHours();
-  return (h >= 18 || h <= 5);
-}
+  // Mouse Events (Desktop)
+  key.addEventListener('mousedown', startDrag);
+  window.addEventListener('mousemove', moveDrag);
+  window.addEventListener('mouseup', endDrag);
 
-/* 🔐 PATTERN UNLOCK */
-let pattern = "";
-function tap(n) {
-  pattern += n;
-  if (pattern === "132") unlock();
-  if (pattern.length > 3) pattern = "";
-}
-
-/* 🔓 FINAL UNLOCK */
-function unlock() {
-  if (!nightAllowed()) {
-    alert("Only night time lo open avtadi 😏🌙");
-    return;
+  function startDrag(e) {
+    if(checkNightRestricted()) return;
+    isDragging = true;
+    key.style.transition = 'none';
   }
-  let pass = prompt("Password cheppu bujji 😘");
-  if (pass === "sudee") {
-    window.location.href = "secret.html";
-  } else {
-    alert("Wrong password ❌");
+
+  function moveDrag(e) {
+    if(!isDragging) return;
+    e.preventDefault(); // Stop scrolling while dragging
+    
+    let clientX = e.touches ? e.touches[0].clientX : e.clientX;
+    let clientY = e.touches ? e.touches[0].clientY : e.clientY;
+
+    // Move key to finger position
+    key.style.position = 'fixed';
+    key.style.left = clientX + 'px';
+    key.style.top = clientY + 'px';
+    key.style.transform = 'translate(-50%, -50%)';
+
+    // Check collision with Heart
+    let zoneRect = zone.getBoundingClientRect();
+    if(clientX > zoneRect.left && clientX < zoneRect.right && 
+       clientY > zoneRect.top && clientY < zoneRect.bottom) {
+       zone.classList.add('drag-over');
+    } else {
+       zone.classList.remove('drag-over');
+    }
   }
-}
+
+  function endDrag(e) {
+    if(!isDragging) return;
+    isDragging = false;
+    
+    // Check if dropped inside
+    if(zone.classList.contains('drag-over')) {
+      // Success!
+      openPasswordPad();
+      key.style.display = 'none'; // Hide key
+    } else {
+      // Return to start
+      key.style.transition = 'all 0.5s ease';
+      key.style.position = 'absolute';
+      key.style.bottom = '-80px';
+      key.style.top = 'auto';
+      key.style.left = '50%';
+      key.style.transform = 'translateX(-50%)';
+    }
+    zone.classList.remove('drag-over');
+  }
+
+  /* --- 3. PASSWORD LOGIC --- */
+  let currentPass = [];
+  const passDisplay = document.getElementById('passDisplay');
+
+  function openPasswordPad() {
+    document.getElementById('passModal').classList.add('open');
+  }
+
+  function typePass(emoji) {
+    if(currentPass.length < 4) {
+      currentPass.push(emoji);
+      updateDisplay();
+      if(currentPass.length === 4) checkPass();
+    }
+  }
+
+  function updateDisplay() {
+    passDisplay.innerText = currentPass.join(' ');
+  }
+
+  function clearPass() {
+    currentPass = [];
+    updateDisplay();
+    passDisplay.style.color = 'white';
+  }
+
+  function checkPass() {
+    // Check if arrays match
+    if(JSON.stringify(currentPass) === JSON.stringify(PASSWORD)) {
+      // Correct!
+      unlockSuccess();
+    } else {
+      // Wrong
+      passDisplay.style.color = '#ff4d6d';
+      setTimeout(clearPass, 500);
+    }
+  }
+
+  /* --- 4. UNLOCK SUCCESS --- */
+  function unlockSuccess() {
+    document.getElementById('passModal').classList.remove('open');
+    confetti({ particleCount: 150, spread: 80, origin: { y: 0.6 } });
+    
+    document.getElementById('lockedView').style.display = 'none';
+    document.getElementById('unlockedView').style.display = 'block';
+    
+    // Start Days Counter
+    const start = new Date("2023-12-09");
+    const diff = Math.floor((new Date() - start) / (1000*60*60*24));
+    document.getElementById('daysCount').innerText = diff;
+  }
+
+  /* --- 5. UTILS --- */
+  function checkNightRestricted() {
+    if(!NIGHT_ONLY) return false;
+    const h = new Date().getHours();
+    // Block if between 6 AM (6) and 6 PM (18)
+    if(h > 5 && h < 18) {
+      const t = document.getElementById('toast');
+      t.style.transform = 'translateY(0)';
+      setTimeout(()=> t.style.transform = 'translateY(-100px)', 3000);
+      return true; // Is restricted
+    }
+    return false;
+  }
 </script>
 
 </body>
