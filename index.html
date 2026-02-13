@@ -40,11 +40,60 @@
       width: 90%; max-width: 380px;
       box-shadow: 0 30px 60px rgba(0,0,0,0.5);
       position: relative; z-index: 10;
-      transition: all 0.6s ease;
+      transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
     }
 
-    .hidden-card { display: none; }
+    /* BLUR EFFECT (Triggered by JS) */
+    .blur-active {
+      filter: blur(15px) brightness(0.6);
+      transform: scale(0.9);
+      pointer-events: none;
+    }
 
+    /* --- THE 5% MARGIN POPUP --- */
+    .surprise-popup {
+      position: fixed;
+      top: 5%; bottom: 5%; left: 5%; right: 5%;
+      background: white;
+      border-radius: 25px;
+      z-index: 1000;
+      box-shadow: 0 20px 80px rgba(0,0,0,0.8);
+      display: flex; flex-direction: column;
+      overflow: hidden;
+      /* Animation State: Hidden */
+      opacity: 0;
+      visibility: hidden;
+      transform: scale(0.8) translateY(50px);
+      transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+
+    /* Animation State: Shown */
+    .surprise-popup.show {
+      opacity: 1;
+      visibility: visible;
+      transform: scale(1) translateY(0);
+    }
+
+    .surprise-popup iframe {
+      width: 100%; height: 100%; border: none; flex-grow: 1;
+    }
+
+    .close-popup-btn {
+      position: absolute;
+      top: 15px; right: 15px;
+      width: 40px; height: 40px;
+      background: #ff4d6d;
+      color: white; border: 2px solid white;
+      border-radius: 50%;
+      font-size: 1.2rem; cursor: pointer;
+      z-index: 1001;
+      display: flex; justify-content: center; align-items: center;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+    }
+
+    /* DRAGGABLE ELEMENTS & UI */
+    .hidden-card { display: none; }
+    
     h1 {
       font-family: 'Dancing Script', cursive; font-size: 3.2rem; margin: 0;
       background: linear-gradient(to right, #fff, #ff99ac);
@@ -52,7 +101,6 @@
       filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3));
     }
 
-    /* TARGET HEART (Drop Zone) */
     .heart-zone {
       width: 100px; height: 100px; margin: 20px auto;
       background: rgba(255, 77, 109, 0.2);
@@ -67,14 +115,13 @@
       box-shadow: 0 0 30px #ff4d6d;
     }
 
-    /* DRAGGABLE KEY */
     .drag-key {
       position: absolute; bottom: -80px; left: 50%;
       transform: translateX(-50%);
       font-size: 3rem; cursor: grab;
       filter: drop-shadow(0 5px 10px rgba(0,0,0,0.5));
       animation: floatKey 3s ease-in-out infinite;
-      z-index: 100; touch-action: none; /* Crucial for mobile drag */
+      z-index: 100; touch-action: none;
     }
     .drag-key:active { cursor: grabbing; animation: none; }
 
@@ -83,13 +130,14 @@
       50% { transform: translateX(-50%) translateY(-15px); }
     }
 
-    /* EMOJI PASSWORD PAD */
+    /* PASSWORD MODAL */
     .emoji-modal {
       position: absolute; top:0; left:0; width:100%; height:100%;
       background: rgba(20, 10, 30, 0.95);
       border-radius: 30px;
       display: flex; flex-direction: column; justify-content: center; align-items: center;
       opacity: 0; pointer-events: none; transition: 0.3s;
+      z-index: 20;
     }
     .emoji-modal.open { opacity: 1; pointer-events: all; }
 
@@ -99,15 +147,22 @@
     .emoji-btn {
       font-size: 2rem; background: rgba(255,255,255,0.1);
       border: none; padding: 15px; border-radius: 15px; cursor: pointer;
-      transition: 0.2s;
     }
-    .emoji-btn:active { background: #ff4d6d; transform: scale(0.9); }
-
     .pass-display {
       font-size: 2rem; letter-spacing: 5px; min-height: 40px; margin-bottom: 10px;
     }
 
-    /* VIDEO & SECRET CONTENT */
+    /* BUTTONS & VIDEO */
+    .surprise-btn {
+      background: linear-gradient(45deg, #ff4d6d, #ff99ac);
+      color: white; border: 2px solid white;
+      padding: 12px 25px; border-radius: 50px; margin-top: 25px;
+      font-size: 1rem; font-weight: bold; cursor: pointer;
+      box-shadow: 0 5px 15px rgba(255, 77, 109, 0.4);
+      transition: transform 0.2s;
+    }
+    .surprise-btn:hover { transform: scale(1.05); }
+
     .video-box {
       margin-top: 15px; border-radius: 15px; overflow: hidden;
       border: 2px solid rgba(255,255,255,0.2);
@@ -124,17 +179,22 @@
     .toast {
       position: fixed; top: 20px; background: white; color: black;
       padding: 8px 20px; border-radius: 20px; font-size: 0.9rem;
-      transform: translateY(-100px); transition: 0.3s; z-index: 200;
+      transform: translateY(-100px); transition: 0.3s; z-index: 2000;
     }
   </style>
 </head>
 <body>
 
 <div class="stars"></div>
-
 <div class="toast" id="toast">Wait for night time! 🌙</div>
 
+<div class="surprise-popup" id="lovePopup">
+  <button class="close-popup-btn" onclick="togglePopup()">✖</button>
+  <iframe id="valFrame" src=""></iframe>
+</div>
+
 <div class="card" id="mainCard">
+  
   <div id="lockedView">
     <h1>Sudheer & Deepu</h1>
     <p style="opacity:0.8; font-size:0.9rem;">Drag the key to the heart ❤️</p>
@@ -146,6 +206,8 @@
       <img src="https://picsum.photos/100?2" style="border-radius:10px; width:70px;">
       <img src="https://picsum.photos/100?3" style="border-radius:10px; width:70px;">
     </div>
+
+    <button class="surprise-btn" onclick="togglePopup()">Valentine Surprise 💘</button>
   </div>
 
   <div class="drag-key" id="dragKey">🗝️</div>
@@ -175,30 +237,50 @@
     <div style="font-size:0.8rem; margin-bottom:15px;">Days Together</div>
 
     <div class="video-box">
-      <iframe src="https://www.youtube.com/embed/2Vv-BfVoq4g?si=vPj3-d8Z3qf&controls=1" frameborder="0" allowfullscreen></iframe>
+      <iframe src="https://www.youtube.com/embed/2Vv-BfVoq4g" frameborder="0" allowfullscreen></iframe>
     </div>
 
     <button class="btn" onclick="location.reload()">🔒 Relock</button>
   </div>
+
 </div>
 
 <script>
-  /* --- 1. CONFIGURATION --- */
-  // The Password Sequence (Change emojis here to set your password)
+  /* CONFIGURATION */
   const PASSWORD = ['😘', '💍', '🏠', '🚀']; 
-  const NIGHT_ONLY = true; // Set false to test in daytime
+  const NIGHT_ONLY = true; 
+
+  /* --- 1. POPUP & BLUR LOGIC --- */
+  function togglePopup() {
+    const popup = document.getElementById('lovePopup');
+    const iframe = document.getElementById('valFrame');
+    const mainCard = document.getElementById('mainCard');
+    
+    if(!popup.classList.contains('show')) {
+        // OPEN
+        iframe.src = "val.html";
+        popup.classList.add('show');
+        mainCard.classList.add('blur-active'); // Add blur
+        confetti({ particleCount: 150, spread: 100, origin: { y: 0.6 } });
+    } else {
+        // CLOSE
+        popup.classList.remove('show');
+        mainCard.classList.remove('blur-active'); // Remove blur
+        setTimeout(() => { iframe.src = ""; }, 500); // Stop video/music
+    }
+  }
 
   /* --- 2. DRAG & DROP LOGIC --- */
   const key = document.getElementById('dragKey');
   const zone = document.getElementById('dropZone');
   let isDragging = false;
   
-  // Touch Events (Mobile)
+  // Touch Events
   key.addEventListener('touchstart', startDrag, {passive: false});
-  key.addEventListener('touchmove', moveDrag, {passive: false});
-  key.addEventListener('touchend', endDrag);
+  window.addEventListener('touchmove', moveDrag, {passive: false});
+  window.addEventListener('touchend', endDrag);
 
-  // Mouse Events (Desktop)
+  // Mouse Events
   key.addEventListener('mousedown', startDrag);
   window.addEventListener('mousemove', moveDrag);
   window.addEventListener('mouseup', endDrag);
@@ -206,23 +288,29 @@
   function startDrag(e) {
     if(checkNightRestricted()) return;
     isDragging = true;
-    key.style.transition = 'none';
+    key.style.transition = 'none'; // Remove animation while dragging
   }
 
   function moveDrag(e) {
     if(!isDragging) return;
-    e.preventDefault(); // Stop scrolling while dragging
+    e.preventDefault(); 
     
-    let clientX = e.touches ? e.touches[0].clientX : e.clientX;
-    let clientY = e.touches ? e.touches[0].clientY : e.clientY;
+    let clientX, clientY;
+    if(e.touches) {
+        clientX = e.touches[0].clientX;
+        clientY = e.touches[0].clientY;
+    } else {
+        clientX = e.clientX;
+        clientY = e.clientY;
+    }
 
-    // Move key to finger position
+    // Move key
     key.style.position = 'fixed';
     key.style.left = clientX + 'px';
     key.style.top = clientY + 'px';
     key.style.transform = 'translate(-50%, -50%)';
 
-    // Check collision with Heart
+    // Check collision with heart
     let zoneRect = zone.getBoundingClientRect();
     if(clientX > zoneRect.left && clientX < zoneRect.right && 
        clientY > zoneRect.top && clientY < zoneRect.bottom) {
@@ -236,13 +324,12 @@
     if(!isDragging) return;
     isDragging = false;
     
-    // Check if dropped inside
     if(zone.classList.contains('drag-over')) {
-      // Success!
+      // Success Drop
       openPasswordPad();
-      key.style.display = 'none'; // Hide key
+      key.style.display = 'none'; 
     } else {
-      // Return to start
+      // Reset position
       key.style.transition = 'all 0.5s ease';
       key.style.position = 'absolute';
       key.style.bottom = '-80px';
@@ -280,12 +367,9 @@
   }
 
   function checkPass() {
-    // Check if arrays match
     if(JSON.stringify(currentPass) === JSON.stringify(PASSWORD)) {
-      // Correct!
       unlockSuccess();
     } else {
-      // Wrong
       passDisplay.style.color = '#ff4d6d';
       setTimeout(clearPass, 500);
     }
@@ -294,27 +378,28 @@
   /* --- 4. UNLOCK SUCCESS --- */
   function unlockSuccess() {
     document.getElementById('passModal').classList.remove('open');
-    confetti({ particleCount: 150, spread: 80, origin: { y: 0.6 } });
+    confetti({ particleCount: 200, spread: 100, origin: { y: 0.6 } });
     
+    // Hide Lock View, Show Content
     document.getElementById('lockedView').style.display = 'none';
     document.getElementById('unlockedView').style.display = 'block';
     
-    // Start Days Counter
+    // Calculate Days
     const start = new Date("2023-12-09");
     const diff = Math.floor((new Date() - start) / (1000*60*60*24));
     document.getElementById('daysCount').innerText = diff;
   }
 
-  /* --- 5. UTILS --- */
+  /* --- 5. TIME CHECK --- */
   function checkNightRestricted() {
     if(!NIGHT_ONLY) return false;
     const h = new Date().getHours();
-    // Block if between 6 AM (6) and 6 PM (18)
+    // Restriction: Between 6 AM (6) and 6 PM (18) is blocked
     if(h > 5 && h < 18) {
       const t = document.getElementById('toast');
       t.style.transform = 'translateY(0)';
       setTimeout(()=> t.style.transform = 'translateY(-100px)', 3000);
-      return true; // Is restricted
+      return true; 
     }
     return false;
   }
