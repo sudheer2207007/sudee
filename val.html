@@ -304,30 +304,113 @@
       opacity: 0.95;
     }
 
-    /* SPOTIFY PLAYER - TOP LEFT SMALL */
+    /* CUSTOM MUSIC PLAYER - BOTTOM CENTER TRANSPARENT */
     .music-section {
       position: fixed;
-      top: 20px;
-      left: 20px;
+      bottom: 20px;
+      left: 50%;
+      transform: translateX(-50%);
       z-index: 999;
-      width: 280px;
+      width: 90%;
+      max-width: 350px;
+    }
+
+    .custom-music-player {
+      background: rgba(255, 255, 255, 0.15);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border-radius: 20px;
+      padding: 12px 18px;
+      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+      border: 1px solid rgba(255, 255, 255, 0.3);
+      transition: 0.3s;
+    }
+
+    .custom-music-player:hover {
+      background: rgba(255, 255, 255, 0.25);
+      box-shadow: 0 15px 50px rgba(255, 107, 157, 0.3);
+    }
+
+    .player-title {
+      font-family: 'Dancing Script', cursive;
+      font-size: 0.95rem;
+      color: #fff;
+      text-align: center;
+      margin-bottom: 10px;
+      font-weight: bold;
+      text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+    }
+
+    .player-controls {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .play-pause-btn {
+      background: linear-gradient(135deg, #ff6b9d, #ff1493);
+      color: white;
+      border: none;
+      padding: 8px;
+      min-width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      font-size: 1rem;
+      cursor: pointer;
+      transition: 0.3s;
+      box-shadow: 0 5px 15px rgba(255, 107, 157, 0.4);
+      flex-shrink: 0;
+    }
+
+    .play-pause-btn:hover {
+      transform: scale(1.1);
+      box-shadow: 0 8px 20px rgba(255, 107, 157, 0.6);
+    }
+
+    .progress-wrapper {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+    }
+
+    .progress-container {
+      width: 100%;
+      height: 5px;
+      background: rgba(255, 255, 255, 0.3);
+      border-radius: 10px;
+      overflow: hidden;
+      cursor: pointer;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+    }
+
+    .progress-bar {
+      height: 100%;
+      background: linear-gradient(90deg, #ff6b9d, #ff1493);
+      width: 0%;
+      transition: width 0.1s linear;
+      border-radius: 10px;
+      box-shadow: 0 0 10px rgba(255, 107, 157, 0.6);
+    }
+
+    .time-display {
+      text-align: center;
+      font-size: 0.75rem;
+      color: rgba(255, 255, 255, 0.9);
+      font-family: 'Montserrat', sans-serif;
+      text-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
     }
 
     .music-label {
-      display: none; /* Hide label for compact design */
+      display: none;
     }
 
     .spotify-container {
-      border-radius: 12px;
-      overflow: hidden;
-      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
-      background: rgba(255, 255, 255, 0.95);
-      backdrop-filter: blur(10px);
+      display: none;
     }
 
     iframe {
-      border-radius: 12px;
-      width: 100%;
+      display: none;
     }
 
     /* FOOTER MESSAGE */
@@ -370,33 +453,9 @@
       }
     }
 
-    /* MUSIC CONTROL BUTTON */
+    /* MUSIC CONTROL BUTTON - HIDDEN (Using bottom player instead) */
     .music-control {
-      position: fixed;
-      bottom: 20px;
-      right: 20px;
-      background: linear-gradient(135deg, #ff6b9d, #ff1493);
-      color: white;
-      border: none;
-      width: 60px;
-      height: 60px;
-      border-radius: 50%;
-      font-size: 1.8rem;
-      cursor: pointer;
-      box-shadow: 0 10px 30px rgba(255, 20, 147, 0.4);
-      z-index: 1000;
-      transition: 0.3s;
-      animation: musicPulse 2s ease-in-out infinite;
-    }
-
-    @keyframes musicPulse {
-      0%, 100% { transform: scale(1); }
-      50% { transform: scale(1.1); }
-    }
-
-    .music-control:hover {
-      transform: scale(1.2);
-      box-shadow: 0 15px 40px rgba(255, 20, 147, 0.6);
+      display: none;
     }
 
     /* Hidden Audio */
@@ -415,14 +474,30 @@
       .photo-stack {
         gap: 15px;
         min-height: auto;
-      }
-      .music-section {
-        width: 240px;
-        top: 10px;
-        left: 10px;
+        padding-bottom: 100px; /* Space for bottom player */
       }
       .timeline-container {
         padding: 20px;
+        margin-bottom: 100px; /* Space for bottom player */
+      }
+      .music-section {
+        width: 95%;
+        max-width: none;
+        bottom: 10px;
+      }
+      .custom-music-player {
+        padding: 10px 15px;
+      }
+      .player-title {
+        font-size: 0.85rem;
+      }
+      .play-pause-btn {
+        min-width: 35px;
+        height: 35px;
+        font-size: 0.9rem;
+      }
+      .time-display {
+        font-size: 0.7rem;
       }
     }
 
@@ -433,11 +508,11 @@
       .polaroid {
         width: 140px;
       }
-      .music-section {
-        width: 200px;
-      }
       .password-box h2 {
         font-size: 2.5rem;
+      }
+      .content-wrapper {
+        padding-bottom: 100px;
       }
     }
 
@@ -639,11 +714,21 @@
     </div>
   </div>
 
-  <!-- Spotify Player - Top Left Small -->
+  <!-- Custom Music Player - Bottom Center Transparent -->
   <div class="music-section">
-    <div class="music-label">🎵 Our Love Song 🎵</div>
-    <div class="spotify-container">
-      <iframe src="https://open.spotify.com/embed/track/6PLRQclweWPLiWjCZEI5mu?utm_source=generator&theme=0" height="80" frameBorder="0" allowfullscreen="" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>
+    <div class="custom-music-player">
+      <div class="player-title">🎵 Our Love Song 🎵</div>
+      <div class="player-controls">
+        <button class="play-pause-btn" id="playPauseBtn" onclick="togglePlayPause()">▶️</button>
+        <div class="progress-wrapper">
+          <div class="progress-container">
+            <div class="progress-bar" id="progressBar"></div>
+          </div>
+          <div class="time-display">
+            <span id="currentTime">0:00</span> / <span id="duration">0:00</span>
+          </div>
+        </div>
+      </div>
     </div>
   </div>
 
@@ -653,9 +738,9 @@
   <!-- Floating Hearts -->
   <div class="floating-hearts" id="floatingHearts"></div>
 
-  <!-- Hidden Auto-Play Audio -->
-  <audio id="bgAudio" loop>
-    <source src="https://cdn.pixabay.com/audio/2022/03/10/audio_4a8bf31a74.mp3" type="audio/mpeg">
+  <!-- Love.mp3 Audio -->
+  <audio id="loveAudio" loop>
+    <source src="love.mp3" type="audio/mpeg">
   </audio>
 
   <!-- Music Control Button -->
@@ -825,18 +910,21 @@
     });
 
     // Auto-play Music on Page Load
-    const audio = document.getElementById('bgAudio');
-    const musicBtn = document.getElementById('musicBtn');
+    const audio = document.getElementById('loveAudio');
+    const playPauseBtn = document.getElementById('playPauseBtn');
+    const progressBar = document.getElementById('progressBar');
+    const currentTimeEl = document.getElementById('currentTime');
+    const durationEl = document.getElementById('duration');
     let isPlaying = false;
 
     // Try to auto-play on load
     window.addEventListener('load', () => {
       audio.play().then(() => {
         isPlaying = true;
-        musicBtn.innerText = '🎵';
+        playPauseBtn.innerText = '⏸️';
       }).catch(() => {
         // If auto-play blocked, user needs to click
-        musicBtn.innerText = '▶️';
+        playPauseBtn.innerText = '▶️';
       });
     });
 
@@ -845,25 +933,57 @@
       if (!isPlaying) {
         audio.play().then(() => {
           isPlaying = true;
-          musicBtn.innerText = '🎵';
+          playPauseBtn.innerText = '⏸️';
         }).catch(() => {});
       }
     }, { once: true });
 
-    // Toggle Music
-    function toggleMusic() {
+    // Toggle Play/Pause from custom player
+    function togglePlayPause() {
       if (isPlaying) {
         audio.pause();
-        musicBtn.innerText = '▶️';
+        playPauseBtn.innerText = '▶️';
         isPlaying = false;
       } else {
         audio.play().then(() => {
-          musicBtn.innerText = '🎵';
+          playPauseBtn.innerText = '⏸️';
           isPlaying = true;
         }).catch(() => {
           alert('Please allow audio to play!');
         });
       }
+    }
+
+    // Toggle Music from bottom button (if exists)
+    function toggleMusic() {
+      togglePlayPause();
+    }
+
+    // Update progress bar and time
+    audio.addEventListener('timeupdate', () => {
+      const progress = (audio.currentTime / audio.duration) * 100;
+      progressBar.style.width = progress + '%';
+      
+      currentTimeEl.innerText = formatTime(audio.currentTime);
+    });
+
+    // Set duration when loaded
+    audio.addEventListener('loadedmetadata', () => {
+      durationEl.innerText = formatTime(audio.duration);
+    });
+
+    // Click on progress bar to seek
+    document.querySelector('.progress-container').addEventListener('click', (e) => {
+      const rect = e.target.getBoundingClientRect();
+      const percent = (e.clientX - rect.left) / rect.width;
+      audio.currentTime = percent * audio.duration;
+    });
+
+    // Format time helper
+    function formatTime(seconds) {
+      const mins = Math.floor(seconds / 60);
+      const secs = Math.floor(seconds % 60);
+      return `${mins}:${secs < 10 ? '0' : ''}${secs}`;
     }
 
     // Calculate Days Together
