@@ -4,6 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Sudheer ❤️ Deepu</title>
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
   <link href="https://fonts.googleapis.com/css2?family=Great+Vibes&family=Montserrat:wght@300;400;600&family=Dancing+Script:wght@400;700&display=swap" rel="stylesheet">
   <style>
     * {
@@ -77,6 +78,7 @@
     .content-wrapper {
       max-width: 1200px;
       margin: 0 auto;
+      padding-bottom: 120px; /* Space for music player */
     }
 
     /* TITLE WITH SHINE */
@@ -106,7 +108,7 @@
       margin-bottom: 20px;
     }
 
-    /* POLAROID STACK - UPDATED FOR 6 PHOTOS */
+    /* POLAROID STACK */
     .photo-stack {
       position: relative;
       min-height: 400px;
@@ -275,6 +277,7 @@
       margin-top: 10px;
       opacity: 0.95;
     }
+
     .days-counter {
       background: linear-gradient(135deg, #ff6b9d, #ee5a6f);
       color: white;
@@ -304,7 +307,7 @@
       opacity: 0.95;
     }
 
-    /* CUSTOM MUSIC PLAYER - BOTTOM CENTER TRANSPARENT */
+    /* CUSTOM MUSIC PLAYER */
     .music-section {
       position: fixed;
       bottom: 20px;
@@ -401,18 +404,6 @@
       text-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
     }
 
-    .music-label {
-      display: none;
-    }
-
-    .spotify-container {
-      display: none;
-    }
-
-    iframe {
-      display: none;
-    }
-
     /* FOOTER MESSAGE */
     .footer-message {
       text-align: center;
@@ -453,67 +444,25 @@
       }
     }
 
-    /* MUSIC CONTROL BUTTON - HIDDEN (Using bottom player instead) */
-    .music-control {
-      display: none;
-    }
-
     /* Hidden Audio */
     audio {
       display: none;
     }
 
-    /* Responsive */
-    @media (max-width: 768px) {
-      h1 {
-        font-size: 2.5rem;
-      }
-      .polaroid {
-        width: 160px;
-      }
-      .photo-stack {
-        gap: 15px;
-        min-height: auto;
-        padding-bottom: 100px; /* Space for bottom player */
-      }
-      .timeline-container {
-        padding: 20px;
-        margin-bottom: 100px; /* Space for bottom player */
-      }
-      .music-section {
-        width: 95%;
-        max-width: none;
-        bottom: 10px;
-      }
-      .custom-music-player {
-        padding: 10px 15px;
-      }
-      .player-title {
-        font-size: 0.85rem;
-      }
-      .play-pause-btn {
-        min-width: 35px;
-        height: 35px;
-        font-size: 0.9rem;
-      }
-      .time-display {
-        font-size: 0.7rem;
-      }
+    /* FIREWORKS CANVAS */
+    #fireworksCanvas {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 9999;
+      display: none;
     }
 
-    @media (max-width: 480px) {
-      h1 {
-        font-size: 2rem;
-      }
-      .polaroid {
-        width: 140px;
-      }
-      .password-box h2 {
-        font-size: 2.5rem;
-      }
-      .content-wrapper {
-        padding-bottom: 100px;
-      }
+    #fireworksCanvas.active {
+      display: block;
     }
 
     /* PASSWORD OVERLAY */
@@ -677,11 +626,29 @@
       margin: 15px 0;
       animation: heartBeat 1.5s ease-in-out infinite;
     }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+      h1 { font-size: 2.5rem; }
+      .polaroid { width: 160px; }
+      .photo-stack { gap: 15px; min-height: auto; }
+      .timeline-container { padding: 20px; }
+      .music-section { width: 95%; max-width: none; bottom: 10px; }
+      .custom-music-player { padding: 10px 15px; }
+      .player-title { font-size: 0.85rem; }
+      .play-pause-btn { min-width: 35px; height: 35px; font-size: 0.9rem; }
+      .time-display { font-size: 0.7rem; }
+    }
+
+    @media (max-width: 480px) {
+      h1 { font-size: 2rem; }
+      .polaroid { width: 140px; }
+      .password-box h2 { font-size: 2.5rem; }
+    }
   </style>
 </head>
 <body>
 
-  <!-- Password Overlay -->
   <div class="password-overlay" id="passwordOverlay">
     <div class="password-box">
       <h2>💖 For My Love 💖</h2>
@@ -714,7 +681,6 @@
     </div>
   </div>
 
-  <!-- Custom Music Player - Bottom Center Transparent -->
   <div class="music-section">
     <div class="custom-music-player">
       <div class="player-title">🎵 Our Love Song 🎵</div>
@@ -732,34 +698,27 @@
     </div>
   </div>
 
-  <!-- Floating Particles -->
   <div class="particles" id="particles"></div>
 
-  <!-- Floating Hearts -->
   <div class="floating-hearts" id="floatingHearts"></div>
 
-  <!-- Love.mp3 Audio -->
+  <canvas id="fireworksCanvas"></canvas>
+
   <audio id="loveAudio" loop>
     <source src="love.mp3" type="audio/mpeg">
   </audio>
 
-  <!-- Music Control Button -->
-  <button class="music-control" id="musicBtn" onclick="toggleMusic()">🎵</button>
-
-  <!-- Main Card -->
   <div class="love-card">
     <div class="content-wrapper">
       <h1>Sudheer & Deepu</h1>
       <div class="subtitle">💕 Our Forever Love Story 💕</div>
 
-      <!-- Live Clock with Date and Time -->
       <div class="live-clock">
         <h3>⏰ Our Time Together ⏰</h3>
         <div class="clock-display" id="liveClock">00:00:00</div>
         <div class="date-display" id="liveDate">Loading...</div>
       </div>
 
-      <!-- Photo Stack with 6 Photos -->
       <div class="photo-stack">
         <div class="polaroid">
           <img src="https://i.ibb.co/svJfRNP6/541971579-17895707241291569-4553545070768231576-n-1.jpg" alt="Us Together">
@@ -787,26 +746,22 @@
         </div>
       </div>
 
-      <!-- Hearts Decoration -->
       <div class="hearts-decoration">
         💕 ❤️ 💖 💗 💓 💞
       </div>
 
-      <!-- Message -->
       <div class="message">
         Every moment with you is <strong>magic</strong>. ✨<br>
         You are my <strong>universe</strong>, my <strong>everything</strong>. 🌟<br>
         Together, we create our own <strong>beautiful story</strong>. 💕
       </div>
 
-      <!-- Days Counter -->
       <div class="days-counter">
         <div class="label">💑 Days Together 💑</div>
         <span class="number" id="daysCount">0</span>
         <div class="label">Since December 9, 2023</div>
       </div>
 
-      <!-- Timeline Section with Symbols -->
       <div class="timeline-container">
         <div class="timeline-title">💖 Our Love Timeline 💖</div>
         
@@ -851,7 +806,6 @@
         </div>
       </div>
 
-      <!-- Footer Message -->
       <div class="footer-message">
         💖 Made with Infinite Love 💖
       </div>
@@ -859,6 +813,15 @@
   </div>
 
   <script>
+    // --- FIX FOR WORKER SECURITY ERROR ---
+    // We create a specific confetti instance that is forced to run on the main thread
+    // avoiding the Blob/Worker issue.
+    var myConfetti = confetti.create(undefined, {
+      resize: true,
+      useWorker: false // <--- THIS FIXES THE ERROR
+    });
+    // -------------------------------------
+
     // Password Protection
     const correctPassword = '09/12/2023';
     
@@ -869,11 +832,28 @@
       const userInput = input.value.trim();
       
       if (userInput === correctPassword) {
-        // Correct password!
+        // Correct password! Start celebrations!
+        
+        // 1. Hide password overlay
         overlay.classList.add('hidden');
         setTimeout(() => {
           overlay.style.display = 'none';
         }, 500);
+        
+        // 2. Start music immediately (Valid user interaction allows this)
+        if (audio) {
+          audio.play().then(() => {
+            isPlaying = true;
+            playPauseBtn.innerText = '⏸️';
+            console.log("Music started successfully");
+          }).catch((err) => {
+            console.log('Auto-play prevented (browser policy):', err);
+          });
+        }
+        
+        // 3. Launch celebration effects
+        startCelebration();
+        
       } else {
         // Wrong password
         error.classList.add('show');
@@ -885,6 +865,174 @@
           input.style.borderColor = '#ff6b9d';
         }, 2000);
       }
+    }
+    
+    // Celebration function using FIXED confetti instance
+    function startCelebration() {
+      // Confetti burst 1
+      myConfetti({
+        particleCount: 150,
+        spread: 70,
+        origin: { y: 0.6 },
+        colors: ['#ff6b9d', '#ff1493', '#ffd700', '#ff69b4', '#ffb6c1']
+      });
+      
+      // Confetti burst 2 - from left
+      setTimeout(() => {
+        myConfetti({
+          particleCount: 100,
+          angle: 60,
+          spread: 55,
+          origin: { x: 0, y: 0.7 },
+          colors: ['#ff6b9d', '#ff1493', '#ffd700', '#ff69b4', '#ffb6c1']
+        });
+      }, 250);
+      
+      // Confetti burst 3 - from right
+      setTimeout(() => {
+        myConfetti({
+          particleCount: 100,
+          angle: 120,
+          spread: 55,
+          origin: { x: 1, y: 0.7 },
+          colors: ['#ff6b9d', '#ff1493', '#ffd700', '#ff69b4', '#ffb6c1']
+        });
+      }, 500);
+      
+      // Hearts confetti
+      setTimeout(() => {
+        myConfetti({
+          particleCount: 80,
+          spread: 80,
+          origin: { y: 0.5 },
+          shapes: ['circle'],
+          colors: ['#ff1493', '#ff69b4', '#ffb6c1', '#ff6b9d']
+        });
+      }, 750);
+      
+      // Start fireworks
+      startFireworks();
+    }
+    
+    // Fireworks animation (Canvas Logic)
+    function startFireworks() {
+      const canvas = document.getElementById('fireworksCanvas');
+      const ctx = canvas.getContext('2d');
+      canvas.classList.add('active');
+      
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+      
+      const fireworks = [];
+      const particles = [];
+      
+      class Firework {
+        constructor() {
+          this.x = Math.random() * canvas.width;
+          this.y = canvas.height;
+          this.targetY = Math.random() * canvas.height * 0.5;
+          this.speed = 3 + Math.random() * 2;
+          this.color = ['#ff1493', '#ffd700', '#00ffff', '#ff69b4', '#ffb6c1'][Math.floor(Math.random() * 5)];
+        }
+        
+        update() {
+          this.y -= this.speed;
+          if (this.y <= this.targetY) {
+            return true; // Explode
+          }
+          return false;
+        }
+        
+        draw() {
+          ctx.beginPath();
+          ctx.arc(this.x, this.y, 3, 0, Math.PI * 2);
+          ctx.fillStyle = this.color;
+          ctx.fill();
+        }
+      }
+      
+      class Particle {
+        constructor(x, y, color) {
+          this.x = x;
+          this.y = y;
+          this.color = color;
+          const angle = Math.random() * Math.PI * 2;
+          const speed = 1 + Math.random() * 3;
+          this.vx = Math.cos(angle) * speed;
+          this.vy = Math.sin(angle) * speed;
+          this.alpha = 1;
+          this.decay = 0.015;
+        }
+        
+        update() {
+          this.x += this.vx;
+          this.y += this.vy;
+          this.vy += 0.05; // Gravity
+          this.alpha -= this.decay;
+        }
+        
+        draw() {
+          ctx.save();
+          ctx.globalAlpha = this.alpha;
+          ctx.beginPath();
+          ctx.arc(this.x, this.y, 2, 0, Math.PI * 2);
+          ctx.fillStyle = this.color;
+          ctx.fill();
+          ctx.restore();
+        }
+      }
+      
+      function createFirework() {
+        fireworks.push(new Firework());
+      }
+      
+      function explode(x, y, color) {
+        for (let i = 0; i < 50; i++) {
+          particles.push(new Particle(x, y, color));
+        }
+      }
+      
+      let fireworkInterval = setInterval(() => {
+        createFirework();
+      }, 400);
+      
+      let animationCount = 0;
+      function animate() {
+        animationCount++;
+        
+        ctx.fillStyle = 'rgba(0, 0, 0, 0.1)';
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        
+        // Update and draw fireworks
+        for (let i = fireworks.length - 1; i >= 0; i--) {
+          fireworks[i].draw();
+          if (fireworks[i].update()) {
+            explode(fireworks[i].x, fireworks[i].y, fireworks[i].color);
+            fireworks.splice(i, 1);
+          }
+        }
+        
+        // Update and draw particles
+        for (let i = particles.length - 1; i >= 0; i--) {
+          particles[i].update();
+          particles[i].draw();
+          if (particles[i].alpha <= 0) {
+            particles.splice(i, 1);
+          }
+        }
+        
+        // Stop after 8 seconds
+        if (animationCount < 240) {
+          requestAnimationFrame(animate);
+        } else {
+          clearInterval(fireworkInterval);
+          setTimeout(() => {
+            canvas.classList.remove('active');
+          }, 1000);
+        }
+      }
+      
+      animate();
     }
     
     // Allow Enter key to submit
@@ -909,34 +1057,13 @@
       });
     });
 
-    // Auto-play Music on Page Load
+    // Audio & Music Player Logic
     const audio = document.getElementById('loveAudio');
     const playPauseBtn = document.getElementById('playPauseBtn');
     const progressBar = document.getElementById('progressBar');
     const currentTimeEl = document.getElementById('currentTime');
     const durationEl = document.getElementById('duration');
     let isPlaying = false;
-
-    // Try to auto-play on load
-    window.addEventListener('load', () => {
-      audio.play().then(() => {
-        isPlaying = true;
-        playPauseBtn.innerText = '⏸️';
-      }).catch(() => {
-        // If auto-play blocked, user needs to click
-        playPauseBtn.innerText = '▶️';
-      });
-    });
-
-    // Also try on first user interaction
-    document.addEventListener('click', () => {
-      if (!isPlaying) {
-        audio.play().then(() => {
-          isPlaying = true;
-          playPauseBtn.innerText = '⏸️';
-        }).catch(() => {});
-      }
-    }, { once: true });
 
     // Toggle Play/Pause from custom player
     function togglePlayPause() {
@@ -949,22 +1076,18 @@
           playPauseBtn.innerText = '⏸️';
           isPlaying = true;
         }).catch(() => {
-          alert('Please allow audio to play!');
+          alert('Please click on the page to allow audio!');
         });
       }
     }
 
-    // Toggle Music from bottom button (if exists)
-    function toggleMusic() {
-      togglePlayPause();
-    }
-
     // Update progress bar and time
     audio.addEventListener('timeupdate', () => {
-      const progress = (audio.currentTime / audio.duration) * 100;
-      progressBar.style.width = progress + '%';
-      
-      currentTimeEl.innerText = formatTime(audio.currentTime);
+      if (!isNaN(audio.duration)) {
+        const progress = (audio.currentTime / audio.duration) * 100;
+        progressBar.style.width = progress + '%';
+        currentTimeEl.innerText = formatTime(audio.currentTime);
+      }
     });
 
     // Set duration when loaded
@@ -976,11 +1099,14 @@
     document.querySelector('.progress-container').addEventListener('click', (e) => {
       const rect = e.target.getBoundingClientRect();
       const percent = (e.clientX - rect.left) / rect.width;
-      audio.currentTime = percent * audio.duration;
+      if (!isNaN(audio.duration)) {
+        audio.currentTime = percent * audio.duration;
+      }
     });
 
     // Format time helper
     function formatTime(seconds) {
+      if (isNaN(seconds)) return "0:00";
       const mins = Math.floor(seconds / 60);
       const secs = Math.floor(seconds % 60);
       return `${mins}:${secs < 10 ? '0' : ''}${secs}`;
