@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>✨ Meghana's Birthday Universe ✨</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
@@ -18,28 +18,28 @@
         * { margin: 0; padding: 0; box-sizing: border-box; }
 
         body {
-            /* NEW BACKGROUND: Purple/Pink Galaxy Gradient */
             background: radial-gradient(circle at center, #2e003e 0%, #0d001a 60%, #000000 100%);
             color: white;
             font-family: 'Montserrat', sans-serif;
             overflow: hidden;
             height: 100vh;
+            width: 100vw;
             perspective: 2000px;
         }
 
-        /* ===== SHINCHAN CORNER (Fixed & Glowing) ===== */
+        /* ===== SHINCHAN CORNER ===== */
         .shinchan-corner-container {
             position: fixed;
-            bottom: 20px;
-            left: 20px;
-            z-index: 99999; /* Top priority */
+            bottom: 10px;
+            left: 10px;
+            z-index: 99999;
             pointer-events: none;
         }
 
         .shinchan-img {
             width: 150px;
             height: auto;
-            filter: drop-shadow(0 0 10px white); /* White glow to make him visible */
+            filter: drop-shadow(0 0 10px white);
             animation: bounce 2s infinite ease-in-out;
         }
 
@@ -84,7 +84,7 @@
             box-shadow: 0 0 15px rgba(255, 215, 0, 0.5);
         }
 
-        /* ===== LOADER ===== */
+        /* ===== LOADER (Tap to Start) ===== */
         #loader {
             position: fixed;
             top: 0; left: 0; width: 100%; height: 100%;
@@ -95,7 +95,20 @@
             align-items: center;
             flex-direction: column;
             transition: opacity 1s;
+            cursor: pointer; /* Indicates clickable */
         }
+        
+        .pulse-btn {
+            margin-top: 20px;
+            padding: 15px 30px;
+            border: 2px solid var(--pink);
+            border-radius: 50px;
+            background: rgba(255, 0, 204, 0.2);
+            color: white;
+            font-weight: bold;
+            animation: pulse 1.5s infinite;
+        }
+        @keyframes pulse { 0% { box-shadow: 0 0 0 0 rgba(255, 0, 204, 0.7); } 70% { box-shadow: 0 0 0 15px rgba(255, 0, 204, 0); } 100% { box-shadow: 0 0 0 0 rgba(255, 0, 204, 0); } }
 
         /* ===== INTRO ===== */
         #intro-layer {
@@ -133,11 +146,12 @@
             position: absolute; top: 50%; left: 50%;
             transform: translate(-50%, -50%);
             text-align: center; z-index: 10;
+            width: 100%;
         }
 
         .hbd-text {
             font-family: 'Cinzel', serif;
-            font-size: clamp(3rem, 10vw, 6rem);
+            font-size: clamp(2.5rem, 8vw, 5rem); /* Adjusted for mobile */
             color: white;
             text-shadow: 0 0 30px var(--pink), 0 0 60px var(--blue);
             animation: pulseGlow 3s infinite alternate;
@@ -149,13 +163,15 @@
 
         .planet-card {
             position: absolute; top: 50%; left: 50%;
-            width: 180px; height: 240px;
+            /* Desktop Default */
+            width: 180px; height: 240px; 
             background: rgba(255, 255, 255, 0.1);
             border: 2px solid rgba(255, 255, 255, 0.5);
             border-radius: 20px;
             padding: 10px;
             transform-style: preserve-3d;
             box-shadow: 0 0 20px rgba(255, 0, 204, 0.3);
+            /* Important: The JS controls X/Z translate, CSS controls centering */
         }
 
         .planet-card img { width: 100%; height: 82%; object-fit: cover; border-radius: 15px; }
@@ -182,22 +198,51 @@
         .controls {
             position: fixed; bottom: 30px; width: 100%;
             display: flex; justify-content: center; gap: 15px; z-index: 100;
+            flex-wrap: wrap; /* Allows wrapping on small screens */
+            padding: 0 10px;
         }
 
         .ctrl-btn {
             background: rgba(255,255,255,0.2); border: 2px solid white; color: white;
-            padding: 12px 30px; border-radius: 50px; cursor: pointer; font-weight: bold;
+            padding: 12px 25px; border-radius: 50px; cursor: pointer; font-weight: bold;
             backdrop-filter: blur(5px);
+            font-size: 0.9rem;
         }
 
         #stars { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; }
         .star { position: absolute; background: white; border-radius: 50%; animation: twinkle 3s infinite; }
         @keyframes twinkle { 0% { opacity: 0.3; } 50% { opacity: 1; } 100% { opacity: 0.3; } }
+
+        /* ===== MOBILE OPTIMIZATION ===== */
+        @media (max-width: 768px) {
+            .planet-card {
+                width: 120px; /* Smaller cards for mobile */
+                height: 170px;
+            }
+            .shinchan-img {
+                width: 100px; /* Smaller Shinchan */
+            }
+            .shinchan-corner-container {
+                bottom: 80px; /* Move up so controls don't block him */
+                left: -10px;
+            }
+            .controls {
+                bottom: 20px;
+                gap: 10px;
+            }
+            .ctrl-btn {
+                padding: 10px 15px;
+                font-size: 0.8rem;
+            }
+            .hbd-text {
+                font-size: 2.5rem; /* Ensure title fits */
+            }
+        }
     </style>
 </head>
 <body>
 
-    <audio id="bgMusic" loop autoplay>
+    <audio id="bgMusic" loop>
         <source src="TEMPLE.MP3" type="audio/mpeg">
     </audio>
 
@@ -209,9 +254,10 @@
         <span id="musicIcon" style="font-size: 24px;">🎵</span>
     </div>
 
-    <div id="loader">
-        <div style="color: var(--gold); letter-spacing: 4px; font-size: 1.5rem;">INITIALIZING...</div>
-        <div style="margin-top: 15px; font-size: 0.8rem; opacity: 0.7;">CHUSINDI CHALU SCREEN MEDA TAP 👆CHAYEE SWEETY </div>
+    <div id="loader" onclick="startExperience()">
+        <div style="color: var(--gold); letter-spacing: 4px; font-size: 1.5rem; text-align:center;">INITIALIZING...</div>
+        <div class="pulse-btn">CLICK TO START 👆</div>
+        <div style="margin-top: 15px; font-size: 0.8rem; opacity: 0.7;">Sound On 🔊</div>
     </div>
 
     <div id="intro-layer">
@@ -247,7 +293,7 @@
     <div class="modal" id="videoModal">
         <div style="width: 90%; max-width: 800px; position: relative;">
             <div class="close-btn" onclick="closeModal('videoModal')" style="color: white; top: -40px;">×</div>
-            <iframe src="https://go.screenpal.com/watch/cOn2Xvn0Fhf" style="width: 100%; height: 450px; border-radius: 15px; border: 2px solid var(--blue);"></iframe>
+            <iframe src="https://go.screenpal.com/watch/cOn2Xvn0Fhf" style="width: 100%; height: 450px; border-radius: 15px; border: 2px solid var(--blue);" allow="autoplay"></iframe>
         </div>
     </div>
 
@@ -269,16 +315,25 @@
             }
         }
 
-        // Auto-play on load or click
-        function attemptPlay() {
+        // --- START EXPERIENCE (FIX FOR AUDIO & LOADING) ---
+        // We only start the animation and music when user CLICKS the loader
+        function startExperience() {
+            // 1. Play Music (Interaction allows this now)
             music.play().then(() => {
                 musicIcon.textContent = '⏸️';
                 isPlaying = true;
-            }).catch(() => console.log("Waiting for interaction"));
+            }).catch(e => console.log("Audio failed:", e));
+
+            // 2. Hide Loader
+            const loader = document.getElementById('loader');
+            loader.style.opacity = '0';
+            
+            // 3. Start Intro after loader fade
+            setTimeout(() => {
+                loader.style.display = 'none';
+                runIntro();
+            }, 1000);
         }
-        
-        document.addEventListener('click', attemptPlay, { once: true });
-        document.addEventListener('touchstart', attemptPlay, { once: true });
 
         // --- SHINCHAN LOGIC ---
         const shinchanGifs = [
@@ -292,15 +347,17 @@
             el.src = shinchanGifs[Math.floor(Math.random() * shinchanGifs.length)];
             el.className = 'shinchan-floater';
             el.style.left = Math.random() * 90 + '%';
-            const size = Math.random() * 60 + 60; // Bigger size
+            
+            // Random size for variety
+            const size = Math.random() * 60 + 50; 
             el.style.width = size + 'px';
             el.style.height = 'auto';
+            
             document.body.appendChild(el);
             setTimeout(() => { el.remove(); }, 12000);
         }
 
-        // Spawn regularly
-        setInterval(spawnShinchan, 2000);
+        setInterval(spawnShinchan, 3000); // Spawns every 3 seconds
 
         // --- UNIVERSE LOGIC ---
         const photos = [
@@ -311,17 +368,6 @@
             { src: "https://i.ibb.co/Kpp1zz7J/IMG-20251212-184509.jpg", label: "Banti 🐻" },
             { src: "https://i.ibb.co/v6YfdGgB/IMG-20251230-120601.jpg", label: "Bestie 💖" }
         ];
-
-        window.onload = () => {
-            attemptPlay();
-            setTimeout(() => {
-                document.getElementById('loader').style.opacity = '0';
-                setTimeout(() => {
-                    document.getElementById('loader').style.display = 'none';
-                    runIntro();
-                }, 1000);
-            }, 1000);
-        };
 
         function runIntro() {
             const intro = document.getElementById('intro-layer');
@@ -341,9 +387,13 @@
         }
 
         let orbitTweens = [];
+        
         function initUniverse() {
             const system = document.getElementById('solar-system');
-            const radius = window.innerWidth < 768 ? 220 : 350;
+            
+            // MOBILE FIX: Reduce radius if screen is small
+            const isMobile = window.innerWidth < 768;
+            const radius = isMobile ? 140 : 350; // 140px for mobile, 350px for PC
             
             photos.forEach((p, i) => {
                 const card = document.createElement('div');
@@ -352,21 +402,30 @@
                 system.appendChild(card);
 
                 const angle = (i / photos.length) * Math.PI * 2;
+                
+                // GSAP Animation for circular path
                 const tween = gsap.to({}, {
                     duration: 35, repeat: -1, ease: "none",
                     onUpdate: function() {
                         const prg = this.progress() * Math.PI * 2;
                         const cur = angle + prg;
+                        
                         const x = Math.cos(cur) * radius;
                         const z = Math.sin(cur) * radius;
-                        card.style.transform = `translate(-50%, -50%) translate3d(${x}px, 0, ${z}px) scale(${(z+600)/600})`;
+                        
+                        // Z-index logic for 3D depth effect
+                        const scale = (z + 600) / 600;
+                        const opacity = (z + 800) / 1200;
+                        
+                        card.style.transform = `translate(-50%, -50%) translate3d(${x}px, 0, ${z}px) scale(${scale})`;
                         card.style.zIndex = Math.round(z + 500);
-                        card.style.opacity = (z + 800) / 1200;
+                        card.style.opacity = opacity;
                     }
                 });
                 orbitTweens.push(tween);
             });
 
+            // Stars Background
             const stars = document.getElementById('stars');
             for(let i=0; i<100; i++) {
                 const s = document.createElement('div');
@@ -386,9 +445,7 @@
             if (music.paused) toggleMusic();
             confetti({ particleCount: 200, spread: 80, origin: { y: 0.6 } });
             
-            // Extra shinchan flood
-            for(let i=0; i<10; i++) setTimeout(spawnShinchan, i*200);
-
+            // Speed up orbits temporarily
             orbitTweens.forEach(t => gsap.to(t, { timeScale: 6, duration: 0.5 }));
             setTimeout(() => {
                 orbitTweens.forEach(t => gsap.to(t, { timeScale: 1, duration: 2 }));
