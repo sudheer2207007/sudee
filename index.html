@@ -12,7 +12,7 @@
       --primary: #ff4d6d;
       --secondary: #c9184a;
       --bg-gradient: linear-gradient(135deg, #ffc8dd 0%, #ffafcc 100%);
-      --glass: rgba(255, 255, 255, 0.85); /* Made less transparent so it's brighter */
+      --glass: rgba(255, 255, 255, 0.85);
       --glass-border: rgba(255, 255, 255, 1);
     }
     * { box-sizing: border-box; user-select: none; -webkit-user-select: none; -webkit-tap-highlight-color: transparent; }
@@ -65,15 +65,15 @@
       100% { transform: translateX(0); }
     }
 
-    /* TITLE - CHANGED TO PINK FOR VISIBILITY */
+    /* TITLE */
     h1 {
       font-family: 'Pacifico', cursive; font-size: 2.8rem; margin: 0;
-      color: var(--primary); /* Pink Color */
+      color: var(--primary);
       text-shadow: 2px 2px 0px rgba(255, 255, 255, 0.5);
       margin-bottom: 10px;
     }
 
-    /* --- CUTENESS SCANNER (LIQUID HEART) --- */
+    /* --- CUTENESS SCANNER --- */
     .heart-scanner {
       width: 130px; height: 130px; margin: 30px auto;
       position: relative; cursor: pointer;
@@ -82,10 +82,9 @@
     }
     .heart-scanner:active { transform: scale(0.95); }
 
-    /* CHANGED HEART BORDER TO PINK */
     .heart-bg {
       fill: rgba(255, 255, 255, 0.5); 
-      stroke: #ff4d6d; /* Visible Pink Stroke */
+      stroke: #ff4d6d;
       stroke-width: 4px;
     }
     
@@ -101,7 +100,6 @@
       transition: transform 2.5s ease-in-out;
     }
 
-    /* CHANGED TEXT COLOR TO DARK RED */
     .status-text {
       font-size: 1.1rem; color: #800f2f; font-weight: bold;
       min-height: 30px; margin-top: 10px;
@@ -153,6 +151,7 @@
       background: white; padding: 10px; border-radius: 15px;
       box-shadow: 0 5px 20px rgba(0,0,0,0.1);
       border: 2px solid #ffccd5;
+      z-index: 50;
     }
     .secret-input {
       width: 80px; padding: 8px; border: 1px solid #ddd; border-radius: 8px; text-align: center;
@@ -179,7 +178,7 @@
     }
     .action-btn:hover { transform: scale(1.05); background: #e01e37; }
 
-    /* POPUP */
+    /* POPUP FOR VALENTINE */
     .surprise-popup {
       position: fixed; top: 0; left: 0; width: 100%; height: 100%;
       background: rgba(0,0,0,0.8); z-index: 2000;
@@ -196,6 +195,20 @@
       z-index: 100;
     }
 
+    /* --- NEW: POPUP FOR BIR.HTML --- */
+    .bir-popup {
+        display: none; 
+        position: fixed;
+        /* l10 r10 t10 b10 cut logic */
+        top: 10%; bottom: 10%; left: 10%; right: 10%;
+        background: white;
+        z-index: 3000;
+        border-radius: 20px;
+        box-shadow: 0 0 100px rgba(0,0,0,0.8);
+        border: 4px solid #ff4d6d;
+        overflow: hidden;
+    }
+
   </style>
 </head>
 <body>
@@ -209,6 +222,11 @@
     <button class="close-btn" onclick="togglePopup()">✖</button>
     <iframe id="valFrame" style="width:100%; height:100%; border:none;" src=""></iframe>
   </div>
+</div>
+
+<div class="bir-popup" id="birPopup">
+    <button class="close-btn" onclick="closeBir()" style="z-index:3001;">✖</button>
+    <iframe id="birFrame" style="width:100%; height:100%; border:none;" src=""></iframe>
 </div>
 
 <div class="card" id="mainCard">
@@ -386,13 +404,32 @@
     }
   }
 
+  // --- UPDATED LISTENER FOR BIR.HTML POPUP ---
   document.getElementById('secretInput').addEventListener('input', function(e) {
     if(e.target.value === MAGGIE_CODE) {
-        window.location.href = 'bir.html';
+        // Instead of redirecting, show the popup
+        const birPopup = document.getElementById('birPopup');
+        const birFrame = document.getElementById('birFrame');
+        
+        birFrame.src = 'bir.html';
+        birPopup.style.display = 'block';
+        
+        // Hide the small input box
+        document.getElementById('secretBox').style.display = 'none';
+        
+        // Optional: clear input
+        e.target.value = '';
     }
   });
 
-  /* --- 4. POPUP --- */
+  function closeBir() {
+      const birPopup = document.getElementById('birPopup');
+      const birFrame = document.getElementById('birFrame');
+      birPopup.style.display = 'none';
+      birFrame.src = ""; // Stop audio/video playing
+  }
+
+  /* --- 4. POPUP (Valentine) --- */
   function togglePopup() {
     const popup = document.getElementById('lovePopup');
     const frame = document.getElementById('valFrame');
