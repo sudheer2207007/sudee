@@ -1,0 +1,399 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>✨ Meghana's Birthday Universe ✨</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&family=Satisfy&family=Montserrat:wght@300;600;800&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --gold: #ffd700;
+            --pink: #ff00cc;
+            --blue: #00ffff;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            /* NEW BACKGROUND: Purple/Pink Galaxy Gradient */
+            background: radial-gradient(circle at center, #2e003e 0%, #0d001a 60%, #000000 100%);
+            color: white;
+            font-family: 'Montserrat', sans-serif;
+            overflow: hidden;
+            height: 100vh;
+            perspective: 2000px;
+        }
+
+        /* ===== SHINCHAN CORNER (Fixed & Glowing) ===== */
+        .shinchan-corner-container {
+            position: fixed;
+            bottom: 20px;
+            left: 20px;
+            z-index: 99999; /* Top priority */
+            pointer-events: none;
+        }
+
+        .shinchan-img {
+            width: 150px;
+            height: auto;
+            filter: drop-shadow(0 0 10px white); /* White glow to make him visible */
+            animation: bounce 2s infinite ease-in-out;
+        }
+
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-15px); }
+        }
+
+        /* ===== FLOATING SHINCHANS ===== */
+        .shinchan-floater {
+            position: fixed;
+            bottom: -50px;
+            z-index: 50;
+            pointer-events: none;
+            animation: floatUp 12s linear forwards;
+            opacity: 0.8;
+            filter: drop-shadow(0 0 5px var(--pink));
+        }
+
+        @keyframes floatUp {
+            0% { transform: translateY(0) rotate(0deg); }
+            100% { transform: translateY(-110vh) rotate(360deg); }
+        }
+
+        /* ===== MUSIC CONTROL ===== */
+        .music-control {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 10001;
+            background: rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(10px);
+            border: 2px solid var(--gold);
+            padding: 10px;
+            border-radius: 50%;
+            cursor: pointer;
+            width: 50px;
+            height: 50px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            box-shadow: 0 0 15px rgba(255, 215, 0, 0.5);
+        }
+
+        /* ===== LOADER ===== */
+        #loader {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: #0d001a;
+            z-index: 10000;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            transition: opacity 1s;
+        }
+
+        /* ===== INTRO ===== */
+        #intro-layer {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: #0d001a;
+            z-index: 9999;
+            display: none;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+        }
+        
+        .intro-text {
+            font-family: 'Cinzel', serif;
+            font-size: clamp(1.5rem, 5vw, 3rem);
+            background: linear-gradient(90deg, #fff, var(--pink), var(--blue));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            opacity: 0;
+            text-align: center;
+            padding: 0 20px;
+        }
+
+        /* ===== UNIVERSE ===== */
+        #universe {
+            width: 100%; height: 100%;
+            position: relative;
+            transform-style: preserve-3d;
+            opacity: 0;
+            transition: opacity 2s;
+        }
+
+        .center-sun {
+            position: absolute; top: 50%; left: 50%;
+            transform: translate(-50%, -50%);
+            text-align: center; z-index: 10;
+        }
+
+        .hbd-text {
+            font-family: 'Cinzel', serif;
+            font-size: clamp(3rem, 10vw, 6rem);
+            color: white;
+            text-shadow: 0 0 30px var(--pink), 0 0 60px var(--blue);
+            animation: pulseGlow 3s infinite alternate;
+        }
+
+        @keyframes pulseGlow { from { transform: scale(1); } to { transform: scale(1.05); } }
+
+        #solar-system { width: 100%; height: 100%; position: absolute; transform-style: preserve-3d; }
+
+        .planet-card {
+            position: absolute; top: 50%; left: 50%;
+            width: 180px; height: 240px;
+            background: rgba(255, 255, 255, 0.1);
+            border: 2px solid rgba(255, 255, 255, 0.5);
+            border-radius: 20px;
+            padding: 10px;
+            transform-style: preserve-3d;
+            box-shadow: 0 0 20px rgba(255, 0, 204, 0.3);
+        }
+
+        .planet-card img { width: 100%; height: 82%; object-fit: cover; border-radius: 15px; }
+
+        /* ===== MODALS ===== */
+        .modal {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.9); z-index: 2000; 
+            display: none; justify-content: center; align-items: center;
+            padding: 20px;
+        }
+        .modal.active { display: flex; }
+
+        .message-card {
+            width: 90%; max-width: 600px;
+            background: linear-gradient(135deg, #1a0b2e, #2e003e);
+            border: 2px solid var(--pink);
+            padding: 30px; border-radius: 20px; position: relative;
+            color: white;
+        }
+
+        .close-btn { position: absolute; top: 10px; right: 20px; cursor: pointer; font-size: 30px; color: white;}
+
+        .controls {
+            position: fixed; bottom: 30px; width: 100%;
+            display: flex; justify-content: center; gap: 15px; z-index: 100;
+        }
+
+        .ctrl-btn {
+            background: rgba(255,255,255,0.2); border: 2px solid white; color: white;
+            padding: 12px 30px; border-radius: 50px; cursor: pointer; font-weight: bold;
+            backdrop-filter: blur(5px);
+        }
+
+        #stars { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; }
+        .star { position: absolute; background: white; border-radius: 50%; animation: twinkle 3s infinite; }
+        @keyframes twinkle { 0% { opacity: 0.3; } 50% { opacity: 1; } 100% { opacity: 0.3; } }
+    </style>
+</head>
+<body>
+
+    <audio id="bgMusic" loop autoplay>
+        <source src="TEMPLE.MP3" type="audio/mpeg">
+    </audio>
+
+    <div class="shinchan-corner-container">
+        <img src="https://media.tenor.com/PWAKk8-JzWwAAAAi/shin-chan-dance.gif" class="shinchan-img" alt="Shinchan">
+    </div>
+
+    <div class="music-control" onclick="toggleMusic()">
+        <span id="musicIcon" style="font-size: 24px;">🎵</span>
+    </div>
+
+    <div id="loader">
+        <div style="color: var(--gold); letter-spacing: 4px; font-size: 1.5rem;">INITIALIZING...</div>
+        <div style="margin-top: 15px; font-size: 0.8rem; opacity: 0.7;">CHUSINDI CHALU SCREEN MEDA TAP 👆CHAYEE SWEETY </div>
+    </div>
+
+    <div id="intro-layer">
+        <div class="intro-text" id="line1">Among billions of stars...</div>
+        <div class="intro-text" id="line2" style="margin-top: 20px;">Only one shines as bright as you ✨</div>
+        <div class="intro-text" id="line3" style="margin-top: 20px;">Happy Birthday Meghana! 🎂</div>
+    </div>
+
+    <div id="universe">
+        <div id="stars"></div>
+        <div class="center-sun">
+            <div class="hbd-text">MEGHANA</div>
+            <div style="color: var(--gold); margin-top: 10px; font-size: 1.2rem;">Banti 🐻 | Maggie 🍜</div>
+        </div>
+        <div id="solar-system"></div>
+        
+        <div class="controls">
+            <button class="ctrl-btn" onclick="openModal('msgModal')">💌 Letter</button>
+            <button class="ctrl-btn" onclick="openModal('videoModal')" style="border-color: var(--blue);">🎬 Video</button>
+            <button class="ctrl-btn" onclick="startParty()" style="border-color: var(--pink); background: rgba(255, 0, 204, 0.2);">🎉 Celebrate</button>
+        </div>
+    </div>
+
+    <div class="modal" id="msgModal">
+        <div class="message-card">
+            <div class="close-btn" onclick="closeModal('msgModal')">×</div>
+            <h2 style="color: var(--gold); text-align: center; margin-bottom: 20px;">Dear Maggie,</h2>
+            <p style="line-height: 1.6;">Happy Birthday to the most beautiful soul! Nuvvu naa life lo ochinappati nunchi, everything feels brighter. You are my safe place, my Banti, and my best friend forever. Stay rare, stay strong! 💕</p>
+            <div style="text-align: right; margin-top: 20px; font-family: 'Satisfy'; color: var(--pink); font-size: 1.5rem;">- Sudheer</div>
+        </div>
+    </div>
+
+    <div class="modal" id="videoModal">
+        <div style="width: 90%; max-width: 800px; position: relative;">
+            <div class="close-btn" onclick="closeModal('videoModal')" style="color: white; top: -40px;">×</div>
+            <iframe src="https://go.screenpal.com/watch/cOn2Xvn0Fhf" style="width: 100%; height: 450px; border-radius: 15px; border: 2px solid var(--blue);"></iframe>
+        </div>
+    </div>
+
+    <script>
+        // --- MUSIC LOGIC ---
+        const music = document.getElementById('bgMusic');
+        const musicIcon = document.getElementById('musicIcon');
+        let isPlaying = false;
+
+        function toggleMusic() {
+            if (music.paused) {
+                music.play();
+                musicIcon.textContent = '⏸️';
+                isPlaying = true;
+            } else {
+                music.pause();
+                musicIcon.textContent = '🎵';
+                isPlaying = false;
+            }
+        }
+
+        // Auto-play on load or click
+        function attemptPlay() {
+            music.play().then(() => {
+                musicIcon.textContent = '⏸️';
+                isPlaying = true;
+            }).catch(() => console.log("Waiting for interaction"));
+        }
+        
+        document.addEventListener('click', attemptPlay, { once: true });
+        document.addEventListener('touchstart', attemptPlay, { once: true });
+
+        // --- SHINCHAN LOGIC ---
+        const shinchanGifs = [
+            "https://media.tenor.com/PWAKk8-JzWwAAAAi/shin-chan-dance.gif", 
+            "https://media.tenor.com/2sJ12rloX-0AAAAi/shinchan-funny.gif",
+            "https://media.tenor.com/V9j3X4qB4kQAAAAi/shin-chan-dance.gif"
+        ];
+
+        function spawnShinchan() {
+            const el = document.createElement('img');
+            el.src = shinchanGifs[Math.floor(Math.random() * shinchanGifs.length)];
+            el.className = 'shinchan-floater';
+            el.style.left = Math.random() * 90 + '%';
+            const size = Math.random() * 60 + 60; // Bigger size
+            el.style.width = size + 'px';
+            el.style.height = 'auto';
+            document.body.appendChild(el);
+            setTimeout(() => { el.remove(); }, 12000);
+        }
+
+        // Spawn regularly
+        setInterval(spawnShinchan, 2000);
+
+        // --- UNIVERSE LOGIC ---
+        const photos = [
+            { src: "https://i.ibb.co/gZNXgf7Z/IMG-20260214-165801-418.jpg", label: "Radiant 💕" },
+            { src: "https://i.ibb.co/67tp1xYh/IMG-20260214-165756-863.jpg", label: "Sunshine ☀️" },
+            { src: "https://i.ibb.co/677HsPRN/IMG-20260214-165753-050.jpg", label: "Grace 🌸" },
+            { src: "https://i.ibb.co/FLXwY0fz/IMG-20260202-154722.jpg", label: "Queen 👑" },
+            { src: "https://i.ibb.co/Kpp1zz7J/IMG-20251212-184509.jpg", label: "Banti 🐻" },
+            { src: "https://i.ibb.co/v6YfdGgB/IMG-20251230-120601.jpg", label: "Bestie 💖" }
+        ];
+
+        window.onload = () => {
+            attemptPlay();
+            setTimeout(() => {
+                document.getElementById('loader').style.opacity = '0';
+                setTimeout(() => {
+                    document.getElementById('loader').style.display = 'none';
+                    runIntro();
+                }, 1000);
+            }, 1000);
+        };
+
+        function runIntro() {
+            const intro = document.getElementById('intro-layer');
+            intro.style.display = 'flex';
+            const tl = gsap.timeline();
+            tl.to("#line1", { opacity: 1, duration: 1.5 })
+              .to("#line1", { opacity: 0, duration: 1, delay: 0.5 })
+              .to("#line2", { opacity: 1, duration: 1.5 })
+              .to("#line2", { opacity: 0, duration: 1, delay: 0.5 })
+              .to("#line3", { opacity: 1, duration: 1.5 })
+              .to("#intro-layer", { opacity: 0, duration: 1, delay: 1 })
+              .call(() => {
+                  intro.style.display = 'none';
+                  document.getElementById('universe').style.opacity = '1';
+                  initUniverse();
+              });
+        }
+
+        let orbitTweens = [];
+        function initUniverse() {
+            const system = document.getElementById('solar-system');
+            const radius = window.innerWidth < 768 ? 220 : 350;
+            
+            photos.forEach((p, i) => {
+                const card = document.createElement('div');
+                card.className = 'planet-card';
+                card.innerHTML = `<img src="${p.src}"><p style="text-align:center; font-size:12px; margin-top:5px;">${p.label}</p>`;
+                system.appendChild(card);
+
+                const angle = (i / photos.length) * Math.PI * 2;
+                const tween = gsap.to({}, {
+                    duration: 35, repeat: -1, ease: "none",
+                    onUpdate: function() {
+                        const prg = this.progress() * Math.PI * 2;
+                        const cur = angle + prg;
+                        const x = Math.cos(cur) * radius;
+                        const z = Math.sin(cur) * radius;
+                        card.style.transform = `translate(-50%, -50%) translate3d(${x}px, 0, ${z}px) scale(${(z+600)/600})`;
+                        card.style.zIndex = Math.round(z + 500);
+                        card.style.opacity = (z + 800) / 1200;
+                    }
+                });
+                orbitTweens.push(tween);
+            });
+
+            const stars = document.getElementById('stars');
+            for(let i=0; i<100; i++) {
+                const s = document.createElement('div');
+                s.className = 'star';
+                s.style.left = Math.random()*100+'%';
+                s.style.top = Math.random()*100+'%';
+                s.style.width = Math.random()*3+'px';
+                s.style.height = s.style.width;
+                stars.appendChild(s);
+            }
+        }
+
+        function openModal(id) { document.getElementById(id).classList.add('active'); }
+        function closeModal(id) { document.getElementById(id).classList.remove('active'); }
+
+        function startParty() {
+            if (music.paused) toggleMusic();
+            confetti({ particleCount: 200, spread: 80, origin: { y: 0.6 } });
+            
+            // Extra shinchan flood
+            for(let i=0; i<10; i++) setTimeout(spawnShinchan, i*200);
+
+            orbitTweens.forEach(t => gsap.to(t, { timeScale: 6, duration: 0.5 }));
+            setTimeout(() => {
+                orbitTweens.forEach(t => gsap.to(t, { timeScale: 1, duration: 2 }));
+            }, 6000);
+        }
+    </script>
+</body>
+</html>

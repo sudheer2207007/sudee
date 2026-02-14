@@ -5,405 +5,419 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
   <title>SUDEE ❤️ DEEPU</title>
   <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
-  <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@700&family=Poppins:wght@300;500;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600&family=Pacifico&family=Poppins:wght@300;500&display=swap" rel="stylesheet">
   
   <style>
     :root {
       --primary: #ff4d6d;
-      --glass: rgba(255, 255, 255, 0.15);
-      --glass-border: rgba(255, 255, 255, 0.3);
+      --secondary: #c9184a;
+      --bg-gradient: linear-gradient(135deg, #ffc8dd 0%, #ffafcc 100%);
+      --glass: rgba(255, 255, 255, 0.85); /* Made less transparent so it's brighter */
+      --glass-border: rgba(255, 255, 255, 1);
     }
-    * { box-sizing: border-box; user-select: none; -webkit-user-select: none; }
+    * { box-sizing: border-box; user-select: none; -webkit-user-select: none; -webkit-tap-highlight-color: transparent; }
 
     body {
       margin: 0; height: 100vh; overflow: hidden;
-      font-family: 'Poppins', sans-serif;
-      background: linear-gradient(135deg, #2b1055, #7597de);
+      font-family: 'Fredoka', sans-serif;
+      background: #ffdde1;
+      background-image: radial-gradient(circle at 50% 50%, #ffffff 0%, #ffdde1 100%);
       display: flex; justify-content: center; align-items: center;
-      color: white;
+      color: #590d22;
     }
 
-    /* BACKGROUND STARS */
-    .stars {
-      position: absolute; top:0; left:0; width:100%; height:100%; pointer-events:none;
-      background-image: radial-gradient(white 1px, transparent 1px);
-      background-size: 50px 50px; opacity: 0.3;
+    /* FLOATING BACKGROUND SHAPES */
+    .bg-shape {
+      position: absolute; border-radius: 50%;
+      background: rgba(255, 255, 255, 0.6);
+      animation: float 6s infinite ease-in-out;
+      z-index: 1;
+    }
+    .shape1 { width: 100px; height: 100px; top: 10%; left: 10%; animation-delay: 0s; }
+    .shape2 { width: 150px; height: 150px; bottom: 20%; right: 10%; animation-delay: 2s; }
+    .shape3 { width: 80px; height: 80px; top: 40%; left: 80%; animation-delay: 4s; }
+
+    @keyframes float {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-20px); }
     }
 
-    /* MAIN CARD */
+    /* MAIN GLASS CARD */
     .card {
       background: var(--glass);
-      backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
-      border: 1px solid var(--glass-border);
-      border-radius: 30px;
+      backdrop-filter: blur(30px); -webkit-backdrop-filter: blur(30px);
+      border: 3px solid white;
+      border-radius: 40px;
       padding: 30px; text-align: center;
       width: 90%; max-width: 380px;
-      box-shadow: 0 30px 60px rgba(0,0,0,0.5);
+      box-shadow: 0 20px 60px rgba(255, 77, 109, 0.25);
       position: relative; z-index: 10;
-      transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+      transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
     }
 
-    /* BLUR EFFECT (Triggered by JS) */
-    .blur-active {
-      filter: blur(15px) brightness(0.6);
-      transform: scale(0.9);
-      pointer-events: none;
+    /* SHAKE ANIMATION */
+    .shake { animation: shake 0.5s; }
+    @keyframes shake {
+      0% { transform: translateX(0); }
+      25% { transform: translateX(-10px) rotate(-5deg); }
+      50% { transform: translateX(10px) rotate(5deg); }
+      75% { transform: translateX(-10px); }
+      100% { transform: translateX(0); }
     }
 
-    /* --- THE 5% MARGIN POPUP --- */
-    .surprise-popup {
-      position: fixed;
-      top: 5%; bottom: 5%; left: 5%; right: 5%;
-      background: white;
-      border-radius: 25px;
-      z-index: 1000;
-      box-shadow: 0 20px 80px rgba(0,0,0,0.8);
-      display: flex; flex-direction: column;
-      overflow: hidden;
-      /* Animation State: Hidden */
-      opacity: 0;
-      visibility: hidden;
-      transform: scale(0.8) translateY(50px);
-      transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-    }
-
-    /* Animation State: Shown */
-    .surprise-popup.show {
-      opacity: 1;
-      visibility: visible;
-      transform: scale(1) translateY(0);
-    }
-
-    .surprise-popup iframe {
-      width: 100%; height: 100%; border: none; flex-grow: 1;
-    }
-
-    .close-popup-btn {
-      position: absolute;
-      top: 15px; right: 15px;
-      width: 40px; height: 40px;
-      background: #ff4d6d;
-      color: white; border: 2px solid white;
-      border-radius: 50%;
-      font-size: 1.2rem; cursor: pointer;
-      z-index: 1001;
-      display: flex; justify-content: center; align-items: center;
-      box-shadow: 0 4px 10px rgba(0,0,0,0.3);
-    }
-
-    /* DRAGGABLE ELEMENTS & UI */
-    .hidden-card { display: none; }
-    
+    /* TITLE - CHANGED TO PINK FOR VISIBILITY */
     h1 {
-      font-family: 'Dancing Script', cursive; font-size: 3.2rem; margin: 0;
-      background: linear-gradient(to right, #fff, #ff99ac);
-      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-      filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3));
+      font-family: 'Pacifico', cursive; font-size: 2.8rem; margin: 0;
+      color: var(--primary); /* Pink Color */
+      text-shadow: 2px 2px 0px rgba(255, 255, 255, 0.5);
+      margin-bottom: 10px;
     }
 
-    .heart-zone {
-      width: 100px; height: 100px; margin: 20px auto;
-      background: rgba(255, 77, 109, 0.2);
+    /* --- CUTENESS SCANNER (LIQUID HEART) --- */
+    .heart-scanner {
+      width: 130px; height: 130px; margin: 30px auto;
+      position: relative; cursor: pointer;
+      transform: scale(1); transition: transform 0.2s;
+      filter: drop-shadow(0 10px 15px rgba(255, 77, 109, 0.3));
+    }
+    .heart-scanner:active { transform: scale(0.95); }
+
+    /* CHANGED HEART BORDER TO PINK */
+    .heart-bg {
+      fill: rgba(255, 255, 255, 0.5); 
+      stroke: #ff4d6d; /* Visible Pink Stroke */
+      stroke-width: 4px;
+    }
+    
+    .liquid {
+      fill: #ff4d6d;
+      clip-path: url(#heart-clip);
+      transform: translateY(100%);
+      transition: transform 0.2s linear;
+    }
+    
+    .filling .liquid {
+      transform: translateY(0%);
+      transition: transform 2.5s ease-in-out;
+    }
+
+    /* CHANGED TEXT COLOR TO DARK RED */
+    .status-text {
+      font-size: 1.1rem; color: #800f2f; font-weight: bold;
+      min-height: 30px; margin-top: 10px;
+    }
+
+    /* --- BUBBLE PIN PAD --- */
+    .pin-container {
+      display: none; flex-direction: column; align-items: center;
+    }
+
+    .bubble-grid {
+      display: flex; flex-wrap: wrap; justify-content: center; gap: 15px;
+      margin: 20px 0; max-width: 260px;
+    }
+
+    .bubble-btn {
+      width: 65px; height: 65px;
+      background: white;
+      border: 2px solid #ffccd5;
+      color: #ff4d6d;
       border-radius: 50%;
+      font-size: 2rem;
       display: flex; justify-content: center; align-items: center;
-      font-size: 3.5rem;
-      border: 2px dashed rgba(255, 255, 255, 0.3);
-      transition: 0.3s;
+      cursor: pointer;
+      box-shadow: 0 5px 10px rgba(255, 77, 109, 0.1);
+      transition: 0.2s;
     }
-    .heart-zone.drag-over {
-      transform: scale(1.2); border-color: #fff; background: rgba(255, 77, 109, 0.5);
-      box-shadow: 0 0 30px #ff4d6d;
+    .bubble-btn:active { transform: scale(0.9); background: #fff0f3; border-color: #ff4d6d; }
+
+    .pass-dots {
+      display: flex; gap: 10px; margin-bottom: 20px; height: 20px;
+    }
+    .dot {
+      width: 15px; height: 15px; background: #ffccd5;
+      border-radius: 50%; transition: 0.3s;
+    }
+    .dot.filled { background: #ff4d6d; transform: scale(1.3); }
+
+    /* SECRET MAGGIE GIFT */
+    .maggie-gift {
+      position: absolute; bottom: 15px; right: 15px;
+      font-size: 1.5rem; cursor: pointer; opacity: 0.8;
+      transition: transform 0.3s;
+    }
+    .maggie-gift:hover { transform: scale(1.2) rotate(10deg); }
+    
+    .secret-box {
+      display: none; position: absolute; bottom: 55px; right: 15px;
+      background: white; padding: 10px; border-radius: 15px;
+      box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+      border: 2px solid #ffccd5;
+    }
+    .secret-input {
+      width: 80px; padding: 8px; border: 1px solid #ddd; border-radius: 8px; text-align: center;
+      outline: none; color: #ff4d6d; font-weight: bold;
     }
 
-    .drag-key {
-      position: absolute; bottom: -80px; left: 50%;
-      transform: translateX(-50%);
-      font-size: 3rem; cursor: grab;
-      filter: drop-shadow(0 5px 10px rgba(0,0,0,0.5));
-      animation: floatKey 3s ease-in-out infinite;
-      z-index: 100; touch-action: none;
-    }
-    .drag-key:active { cursor: grabbing; animation: none; }
+    /* UNLOCKED VIEW */
+    .hidden-card { display: none; opacity: 0; animation: fadeIn 1s forwards; }
+    @keyframes fadeIn { to { opacity: 1; } }
 
-    @keyframes floatKey {
-      0%, 100% { transform: translateX(-50%) translateY(0); }
-      50% { transform: translateX(-50%) translateY(-15px); }
+    .video-frame {
+      border: 4px solid white; border-radius: 20px;
+      overflow: hidden; box-shadow: 0 10px 20px rgba(255, 77, 109, 0.2);
+      margin-top: 15px;
     }
 
-    /* PASSWORD MODAL */
-    .emoji-modal {
-      position: absolute; top:0; left:0; width:100%; height:100%;
-      background: rgba(20, 10, 30, 0.95);
-      border-radius: 30px;
-      display: flex; flex-direction: column; justify-content: center; align-items: center;
-      opacity: 0; pointer-events: none; transition: 0.3s;
-      z-index: 20;
+    /* BUTTON STYLES */
+    .action-btn {
+      margin-top: 20px; background: #ff4d6d; color: white;
+      border: none; padding: 12px 25px; border-radius: 50px;
+      font-weight: bold; cursor: pointer; font-size: 1rem;
+      box-shadow: 0 5px 15px rgba(255, 77, 109, 0.3);
+      transition: 0.2s;
     }
-    .emoji-modal.open { opacity: 1; pointer-events: all; }
+    .action-btn:hover { transform: scale(1.05); background: #e01e37; }
 
-    .emoji-grid {
-      display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; margin-top: 20px;
+    /* POPUP */
+    .surprise-popup {
+      position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+      background: rgba(0,0,0,0.8); z-index: 2000;
+      display: none; justify-content: center; align-items: center;
     }
-    .emoji-btn {
-      font-size: 2rem; background: rgba(255,255,255,0.1);
-      border: none; padding: 15px; border-radius: 15px; cursor: pointer;
+    .popup-content {
+      width: 90%; height: 80%; background: white; border-radius: 20px;
+      overflow: hidden; position: relative;
     }
-    .pass-display {
-      font-size: 2rem; letter-spacing: 5px; min-height: 40px; margin-bottom: 10px;
-    }
-
-    /* BUTTONS & VIDEO */
-    .surprise-btn {
-      background: linear-gradient(45deg, #ff4d6d, #ff99ac);
-      color: white; border: 2px solid white;
-      padding: 12px 25px; border-radius: 50px; margin-top: 25px;
-      font-size: 1rem; font-weight: bold; cursor: pointer;
-      box-shadow: 0 5px 15px rgba(255, 77, 109, 0.4);
-      transition: transform 0.2s;
-    }
-    .surprise-btn:hover { transform: scale(1.05); }
-
-    .video-box {
-      margin-top: 15px; border-radius: 15px; overflow: hidden;
-      border: 2px solid rgba(255,255,255,0.2);
-      position: relative; padding-bottom: 56.25%; height: 0;
-    }
-    .video-box iframe { position: absolute; top:0; left:0; width:100%; height:100%; }
-
-    .btn {
-      background: #ff4d6d; color: white; border: none;
-      padding: 10px 25px; border-radius: 50px; margin-top: 15px;
-      font-size: 1rem; cursor: pointer;
+    .close-btn {
+      position: absolute; top: 10px; right: 10px;
+      background: #ff4d6d; color: white; width: 40px; height: 40px;
+      border-radius: 50%; border: none; font-size: 1.2rem; cursor: pointer;
+      z-index: 100;
     }
 
-    .toast {
-      position: fixed; top: 20px; background: white; color: black;
-      padding: 8px 20px; border-radius: 20px; font-size: 0.9rem;
-      transform: translateY(-100px); transition: 0.3s; z-index: 2000;
-    }
   </style>
 </head>
 <body>
 
-<div class="stars"></div>
-<div class="toast" id="toast">Wait for night time! 🌙</div>
+<div class="bg-shape shape1"></div>
+<div class="bg-shape shape2"></div>
+<div class="bg-shape shape3"></div>
 
 <div class="surprise-popup" id="lovePopup">
-  <button class="close-popup-btn" onclick="togglePopup()">✖</button>
-  <iframe id="valFrame" src=""></iframe>
+  <div class="popup-content">
+    <button class="close-btn" onclick="togglePopup()">✖</button>
+    <iframe id="valFrame" style="width:100%; height:100%; border:none;" src=""></iframe>
+  </div>
 </div>
 
 <div class="card" id="mainCard">
-  
-  <div id="lockedView">
-    <h1>Sudheer & Deepu</h1>
-    <p style="opacity:0.8; font-size:0.9rem;">Drag the key to the heart ❤️</p>
 
-    <div class="heart-zone" id="dropZone">❤️</div>
-
-    <div style="display: flex; gap:10px; justify-content: center; margin-top:20px;">
-      <img src="https://picsum.photos/100?1" style="border-radius:10px; width:70px;">
-      <img src="https://picsum.photos/100?2" style="border-radius:10px; width:70px;">
-      <img src="https://picsum.photos/100?3" style="border-radius:10px; width:70px;">
-    </div>
-
-    <button class="surprise-btn" onclick="togglePopup()">Valentine Surprise 💘</button>
-  </div>
-
-  <div class="drag-key" id="dragKey">🗝️</div>
-
-  <div class="emoji-modal" id="passModal">
-    <h3>Enter Love Code</h3>
-    <div class="pass-display" id="passDisplay"></div>
-    <div class="emoji-grid">
-      <button class="emoji-btn" onclick="typePass('💍')">💍</button>
-      <button class="emoji-btn" onclick="typePass('🌹')">🌹</button>
-      <button class="emoji-btn" onclick="typePass('😘')">😘</button>
-      <button class="emoji-btn" onclick="typePass('🍫')">🍫</button>
-      <button class="emoji-btn" onclick="typePass('🏠')">🏠</button>
-      <button class="emoji-btn" onclick="typePass('🚀')">🚀</button>
-      <button class="emoji-btn" onclick="typePass('🌙')">🌙</button>
-      <button class="emoji-btn" onclick="typePass('🚗')">🚗</button>
-      <button class="emoji-btn" onclick="typePass('🐼')">🐼</button>
-    </div>
-    <button onclick="clearPass()" style="margin-top:20px; background:transparent; border:1px solid #666; color:#aaa; padding:5px 15px; border-radius:15px;">Clear</button>
-  </div>
-
-  <div id="unlockedView" class="hidden-card">
-    <h1>Our Forever</h1>
-    <p>Since Dec 9, 2023</p>
+  <div id="step1">
+    <h1>Love Check</h1>
+    <p style="color: #800f2f; font-size: 0.95rem; margin-bottom:10px;">Hold the heart to fill with Love!</p>
     
-    <div style="font-size:2.5rem; font-weight:bold; color:#ff99ac;" id="daysCount">0</div>
-    <div style="font-size:0.8rem; margin-bottom:15px;">Days Together</div>
-
-    <div class="video-box">
-      <iframe src="https://www.youtube.com/embed/2Vv-BfVoq4g" frameborder="0" allowfullscreen></iframe>
+    <div class="heart-scanner" id="heartBtn" 
+         onmousedown="startFill()" onmouseup="stopFill()" 
+         ontouchstart="startFill()" ontouchend="stopFill()">
+         
+         <svg viewBox="0 0 100 100" width="100%" height="100%">
+           <defs>
+             <clipPath id="heart-clip">
+               <path d="M50 88.9L16.7 55.6C7.2 46.1 7.2 30.9 16.7 21.4 26.2 11.9 41.4 11.9 50.9 21.4L50 22.3 49.1 21.4C58.6 11.9 73.8 11.9 83.3 21.4 92.8 30.9 92.8 46.1 83.3 55.6L50 88.9z"/>
+             </clipPath>
+           </defs>
+           <path class="heart-bg" d="M50 88.9L16.7 55.6C7.2 46.1 7.2 30.9 16.7 21.4 26.2 11.9 41.4 11.9 50.9 21.4L50 22.3 49.1 21.4C58.6 11.9 73.8 11.9 83.3 21.4 92.8 30.9 92.8 46.1 83.3 55.6L50 88.9z"/>
+           <rect x="0" y="0" width="100" height="100" class="liquid" />
+         </svg>
     </div>
 
-    <button class="btn" onclick="location.reload()">🔒 Relock</button>
+    <div class="status-text" id="status">Hold it... 💕</div>
+
+    <button class="action-btn" onclick="togglePopup()">
+       Valentine Surprise 💌
+    </button>
+  </div>
+
+  <div id="step2" class="pin-container">
+    <h1>Who is this?</h1>
+    <p style="color:#800f2f; font-size:0.9rem;">Enter Secret Passcode</p>
+    
+    <div class="pass-dots">
+      <div class="dot" id="dot1"></div>
+      <div class="dot" id="dot2"></div>
+      <div class="dot" id="dot3"></div>
+      <div class="dot" id="dot4"></div>
+    </div>
+
+    <div class="bubble-grid">
+      <div class="bubble-btn" onclick="pressKey('💍')">💍</div>
+      <div class="bubble-btn" onclick="pressKey('🌹')">🌹</div>
+      <div class="bubble-btn" onclick="pressKey('😘')">😘</div>
+      <div class="bubble-btn" onclick="pressKey('🍫')">🍫</div>
+      <div class="bubble-btn" onclick="pressKey('🏠')">🏠</div>
+      <div class="bubble-btn" onclick="pressKey('🚀')">🚀</div>
+      <div class="bubble-btn" onclick="pressKey('🌙')">🌙</div>
+      <div class="bubble-btn" onclick="pressKey('🚗')">🚗</div>
+      <div class="bubble-btn" onclick="pressKey('🐼')">🐼</div>
+    </div>
+    
+    <button onclick="clearPass()" style="margin-top:10px; background:transparent; border:none; color:#ff4d6d; font-weight:bold; cursor:pointer;">Reset</button>
+
+    <div class="maggie-gift" onclick="toggleSecret()">🎁</div>
+    <div class="secret-box" id="secretBox">
+        <input type="number" id="secretInput" class="secret-input" placeholder="Pin?">
+    </div>
+  </div>
+
+  <div id="step3" class="hidden-card">
+    <h1>Sudheer & Deepu</h1>
+    <p style="color:#800f2f;">Forever & Always</p>
+    <div style="font-size:3.5rem; font-weight:bold; color:#ff4d6d; margin:10px 0;" id="daysCount">0</div>
+    <div style="font-size:0.9rem; color:#800f2f;">Days of Love</div>
+
+    <div class="video-frame">
+      <div style="position:relative; padding-bottom:56.25%; height:0;">
+        <iframe src="https://www.youtube.com/embed/2Vv-BfVoq4g" style="position:absolute; top:0; left:0; width:100%; height:100%; border:none;" allowfullscreen></iframe>
+      </div>
+    </div>
+    <button class="action-btn" onclick="location.reload()">Lock 🔒</button>
   </div>
 
 </div>
 
 <script>
-  /* CONFIGURATION */
+  /* CONFIG */
   const PASSWORD = ['😘', '💍', '🏠', '🚀']; 
+  const MAGGIE_CODE = '5555';
   const NIGHT_ONLY = true; 
-
-  /* --- 1. POPUP & BLUR LOGIC --- */
-  function togglePopup() {
-    const popup = document.getElementById('lovePopup');
-    const iframe = document.getElementById('valFrame');
-    const mainCard = document.getElementById('mainCard');
-    
-    if(!popup.classList.contains('show')) {
-        // OPEN
-        iframe.src = "val.html";
-        popup.classList.add('show');
-        mainCard.classList.add('blur-active'); // Add blur
-        confetti({ particleCount: 150, spread: 100, origin: { y: 0.6 } });
-    } else {
-        // CLOSE
-        popup.classList.remove('show');
-        mainCard.classList.remove('blur-active'); // Remove blur
-        setTimeout(() => { iframe.src = ""; }, 500); // Stop video/music
-    }
-  }
-
-  /* --- 2. DRAG & DROP LOGIC --- */
-  const key = document.getElementById('dragKey');
-  const zone = document.getElementById('dropZone');
-  let isDragging = false;
   
-  // Touch Events
-  key.addEventListener('touchstart', startDrag, {passive: false});
-  window.addEventListener('touchmove', moveDrag, {passive: false});
-  window.addEventListener('touchend', endDrag);
 
-  // Mouse Events
-  key.addEventListener('mousedown', startDrag);
-  window.addEventListener('mousemove', moveDrag);
-  window.addEventListener('mouseup', endDrag);
+  /* --- 1. HEART FILL LOGIC --- */
+  let fillTimer;
+  const heartBtn = document.getElementById('heartBtn');
+  const status = document.getElementById('status');
 
-  function startDrag(e) {
-    if(checkNightRestricted()) return;
-    isDragging = true;
-    key.style.transition = 'none'; // Remove animation while dragging
-  }
-
-  function moveDrag(e) {
-    if(!isDragging) return;
-    e.preventDefault(); 
+  function startFill() {
+    if(checkTime()) return;
     
-    let clientX, clientY;
-    if(e.touches) {
-        clientX = e.touches[0].clientX;
-        clientY = e.touches[0].clientY;
-    } else {
-        clientX = e.clientX;
-        clientY = e.clientY;
-    }
-
-    // Move key
-    key.style.position = 'fixed';
-    key.style.left = clientX + 'px';
-    key.style.top = clientY + 'px';
-    key.style.transform = 'translate(-50%, -50%)';
-
-    // Check collision with heart
-    let zoneRect = zone.getBoundingClientRect();
-    if(clientX > zoneRect.left && clientX < zoneRect.right && 
-       clientY > zoneRect.top && clientY < zoneRect.bottom) {
-       zone.classList.add('drag-over');
-    } else {
-       zone.classList.remove('drag-over');
-    }
-  }
-
-  function endDrag(e) {
-    if(!isDragging) return;
-    isDragging = false;
+    heartBtn.classList.add('filling');
+    status.innerText = "Charging Love... 🔋";
+    status.style.color = "#ff4d6d";
     
-    if(zone.classList.contains('drag-over')) {
-      // Success Drop
-      openPasswordPad();
-      key.style.display = 'none'; 
-    } else {
-      // Reset position
-      key.style.transition = 'all 0.5s ease';
-      key.style.position = 'absolute';
-      key.style.bottom = '-80px';
-      key.style.top = 'auto';
-      key.style.left = '50%';
-      key.style.transform = 'translateX(-50%)';
-    }
-    zone.classList.remove('drag-over');
+    // Success after 2.5 seconds hold
+    fillTimer = setTimeout(() => {
+        status.innerText = "LOVE FULL! ❤️";
+        confetti({ particleCount: 150, spread: 70, origin: { y: 0.6 }, colors: ['#ff4d6d', '#fff'] });
+        setTimeout(() => {
+            document.getElementById('step1').style.display = 'none';
+            document.getElementById('step2').style.display = 'flex';
+        }, 1000);
+    }, 2500); 
   }
 
-  /* --- 3. PASSWORD LOGIC --- */
+  function stopFill() {
+    clearTimeout(fillTimer);
+    heartBtn.classList.remove('filling'); // Liquid drains
+    if(status.innerText !== "LOVE FULL! ❤️") {
+        status.innerText = "Don't let go! 🥺";
+        status.style.color = "#800f2f";
+        setTimeout(() => { status.innerText = "Hold to fill... 💕"; }, 1000);
+    }
+  }
+
+  /* --- 2. BUBBLE PASS LOGIC --- */
   let currentPass = [];
-  const passDisplay = document.getElementById('passDisplay');
-
-  function openPasswordPad() {
-    document.getElementById('passModal').classList.add('open');
-  }
-
-  function typePass(emoji) {
+  
+  function pressKey(emoji) {
     if(currentPass.length < 4) {
       currentPass.push(emoji);
-      updateDisplay();
+      updateDots();
       if(currentPass.length === 4) checkPass();
     }
   }
 
-  function updateDisplay() {
-    passDisplay.innerText = currentPass.join(' ');
+  function updateDots() {
+    for(let i=1; i<=4; i++) {
+        const dot = document.getElementById('dot'+i);
+        if(i <= currentPass.length) dot.classList.add('filled');
+        else dot.classList.remove('filled');
+    }
   }
 
   function clearPass() {
     currentPass = [];
-    updateDisplay();
-    passDisplay.style.color = 'white';
+    updateDots();
   }
 
   function checkPass() {
     if(JSON.stringify(currentPass) === JSON.stringify(PASSWORD)) {
-      unlockSuccess();
+        // Success
+        document.getElementById('step2').style.display = 'none';
+        document.getElementById('step3').style.display = 'block';
+        confetti({ particleCount: 200, spread: 100 });
+        
+        // Days Logic
+        const start = new Date("2023-12-09");
+        const diff = Math.floor((new Date() - start) / (1000*60*60*24));
+        document.getElementById('daysCount').innerText = diff;
+        
     } else {
-      passDisplay.style.color = '#ff4d6d';
-      setTimeout(clearPass, 500);
+        // Fail
+        const card = document.getElementById('mainCard');
+        card.classList.add('shake');
+        setTimeout(() => { 
+            card.classList.remove('shake'); 
+            clearPass();
+        }, 500);
     }
   }
 
-  /* --- 4. UNLOCK SUCCESS --- */
-  function unlockSuccess() {
-    document.getElementById('passModal').classList.remove('open');
-    confetti({ particleCount: 200, spread: 100, origin: { y: 0.6 } });
+  /* --- 3. MAGGIE SECRET --- */
+  function toggleSecret() {
+    const box = document.getElementById('secretBox');
+    const input = document.getElementById('secretInput');
     
-    // Hide Lock View, Show Content
-    document.getElementById('lockedView').style.display = 'none';
-    document.getElementById('unlockedView').style.display = 'block';
+    if(box.style.display === 'block') {
+        box.style.display = 'none';
+    } else {
+        box.style.display = 'block';
+        input.focus();
+    }
+  }
+
+  document.getElementById('secretInput').addEventListener('input', function(e) {
+    if(e.target.value === MAGGIE_CODE) {
+        window.location.href = 'bir.html';
+    }
+  });
+
+  /* --- 4. POPUP --- */
+  function togglePopup() {
+    const popup = document.getElementById('lovePopup');
+    const frame = document.getElementById('valFrame');
     
-    // Calculate Days
-    const start = new Date("2023-12-09");
-    const diff = Math.floor((new Date() - start) / (1000*60*60*24));
-    document.getElementById('daysCount').innerText = diff;
+    if(popup.style.display === 'flex') {
+        popup.style.display = 'none';
+        frame.src = "";
+    } else {
+        frame.src = "val.html";
+        popup.style.display = 'flex';
+    }
   }
 
   /* --- 5. TIME CHECK --- */
-  function checkNightRestricted() {
+  function checkTime() {
     if(!NIGHT_ONLY) return false;
     const h = new Date().getHours();
-    // Restriction: Between 6 AM (6) and 6 PM (18) is blocked
-    if(h > 5 && h < 18) {
-      const t = document.getElementById('toast');
-      t.style.transform = 'translateY(0)';
-      setTimeout(()=> t.style.transform = 'translateY(-100px)', 3000);
+    // Block between 6 AM (6) and 1 PM (13)
+    if(h > 5 && h < 13) {
+      alert("Shh! It's daytime! Come back tonight! ☀️");
       return true; 
     }
     return false;
   }
-</script>
 
+</script>
 </body>
 </html>
